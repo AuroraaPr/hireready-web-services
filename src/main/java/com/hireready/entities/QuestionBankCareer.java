@@ -1,4 +1,4 @@
 package com.hireready.entities;
 
-public class QuestionBankCareers {
+public class QuestionBankCareer {
 }
