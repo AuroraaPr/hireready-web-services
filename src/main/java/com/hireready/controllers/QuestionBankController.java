@@ -1,5 +1,6 @@
 package com.hireready.controllers;
 
+import com.hireready.dtos.QuestionBankListResponse;
 import com.hireready.dtos.CreateQuestionBankRequest;
 import com.hireready.entities.QuestionBank;
 import com.hireready.entities.Question;
@@ -22,9 +23,13 @@ public class QuestionBankController {
         return questionBankService.createQuestionBank(request);
     }
 
-    //US07 Listar simulaciones (question banks)
     @GetMapping
     public List<QuestionBank> getAllQuestionBanks(){
         return questionBankService.getAllQuestionBanks();
+    }
+
+    @GetMapping("/applicant")
+    public List<QuestionBankListResponse> listForApplicant() {
+        return questionBankService.listForApplicant();
     }
 }

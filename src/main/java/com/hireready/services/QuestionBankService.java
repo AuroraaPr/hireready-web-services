@@ -1,17 +1,20 @@
 package com.hireready.services;
 
 import com.hireready.dtos.CreateQuestionBankRequest;
-import com.hireready.entities.Career;
-import com.hireready.entities.Question;
-import com.hireready.entities.QuestionBank;
+import com.hireready.dtos.QuestionBankListResponse;
+import com.hireready.entities.*;
 import com.hireready.repositories.CareerRepository;
 import com.hireready.repositories.QuestionBankRepository;
+import com.hireready.repositories.SimulationRepository;
+import java.util.ArrayList;
+import java.util.List;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class QuestionBankService {
@@ -21,6 +24,9 @@ public class QuestionBankService {
 
     @Autowired
     private CareerRepository careerRepository;
+
+    @Autowired
+    private SimulationRepository simulationRepository;
 
     // US06 - Crear banco de preguntas
     @Transactional
@@ -74,5 +80,42 @@ public class QuestionBankService {
     //US07 - Listar bancos
     public List<QuestionBank> getAllQuestionBanks() {
         return questionBankRepository.findAll();
+    }
+
+    public List<QuestionBankListResponse> listForApplicant() {
+
+        return questionBankRepository.findAll().stream().map(qb -> {
+
+            QuestionBankListResponse res = new QuestionBankListResponse();
+
+            res.setId(qb.getId());
+            res.setTitle(qb.getTitle());
+            res.setJobPosition(qb.getJobPosition());
+            res.setLevel(qb.getLevel());
+
+            var simulations = simulationRepository.findByQuestionBankId(qb.getId());
+
+            if (simulations.isEmpty()) {
+                res.setStatus("NOT_STARTED");
+                res.setActions(java.util.List.of("Iniciar"));
+            } else {
+                boolean allCompleted = simulations.stream().allMatch(Simulation::isCompleted);
+
+                if (allCompleted) {
+                    res.setStatus("COMPLETED");
+                    res.setActions(java.util.List.of("Iniciar"));
+                } else {
+                    res.setStatus("IN_PROGRESS");
+                    res.setActions(java.util.List.of("Continuar", "Iniciar"));
+                }
+            }
+
+            res.setQuestionCount(qb.getQuestions().size());
+            res.setCompanyName("Sin empresa");
+
+            return res;
+
+        }).toList();
+
     }
 }
