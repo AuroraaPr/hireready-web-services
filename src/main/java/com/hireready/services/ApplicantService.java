@@ -27,7 +27,7 @@ public class ApplicantService {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
-        user.setRole("ROLE_APPLICANT"); // Asignación del rol
+        user.setRole("ROLE_APPLICANT");
         User savedUser = userRepository.save(user);
 
         Applicant applicant = new Applicant();
