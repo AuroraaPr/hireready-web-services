@@ -1,6 +1,9 @@
 package com.hireready.entities;
 
 import jakarta.persistence.*;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "question_banks")
@@ -11,22 +14,35 @@ public class QuestionBank {
 
     private String title;
 
+    private String jobPosition;
+
+    private String level;
+
+    @OneToMany(mappedBy = "questionBank", cascade = CascadeType.ALL)
+    private List<Question> questions;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "question_bank_careers",
+            joinColumns = @JoinColumn(name = "question_bank_id"),
+            inverseJoinColumns = @JoinColumn(name = "career_id")
+    )
+    private List<Career> careers = new java.util.ArrayList<>();
+
     public QuestionBank() {}
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public String getJobPosition() { return jobPosition; }
+    public String getLevel() { return level; }
+    public List<Question> getQuestions() { return questions; }
+    public List<Career> getCareers() { return careers; }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public void setId(Long id) { this.id = id; }
+    public void setTitle(String title) { this.title = title; }
+    public void setJobPosition(String jobPosition) { this.jobPosition = jobPosition; }
+    public void setLevel(String level) { this.level = level; }
+    public void setQuestions(List<Question> questions) { this.questions = questions; }
+    public void setCareers(List<Career> careers) { this.careers = careers; }
 
 }
