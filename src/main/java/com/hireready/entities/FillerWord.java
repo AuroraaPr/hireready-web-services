@@ -20,5 +20,5 @@ public class FillerWord {
 
     @ManyToOne
     @JoinColumn(name = "simulation_id")
-    Simulation simulation;
+    private Simulation simulation;
 }

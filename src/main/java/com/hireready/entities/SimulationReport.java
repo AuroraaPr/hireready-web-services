@@ -23,5 +23,5 @@ public class SimulationReport {
 
     @OneToOne
     @JoinColumn(name = "simulation_id")
-    Simulation simulation;
+    private Simulation simulation;
 }

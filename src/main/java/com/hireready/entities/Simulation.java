@@ -27,11 +27,11 @@ public class Simulation {
 
     @ManyToOne
     @JoinColumn(name = "applicant_id")
-    Applicant applicant;
+    private Applicant applicant;
 
     @ManyToOne
     @JoinColumn(name = "question_bank_id")
-    QuestionBank questionBank;
+    private QuestionBank questionBank;
 
     @OneToMany(mappedBy = "simulation", fetch = FetchType.EAGER)
     private List<Response> responses;

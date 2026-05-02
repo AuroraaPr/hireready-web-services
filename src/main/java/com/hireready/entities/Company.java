@@ -1,11 +1,17 @@
 package com.hireready.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Entity
 @Table(name = "companies")
-@Data
 public class Company {
 
     @Id
@@ -16,17 +22,10 @@ public class Company {
 
     private String description;
 
-    private boolean active;
-
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public boolean isActive() { return active; }
-
-    public void setId(Long id) { this.id = id; }
-    public void setName(String name) { this.name = name; }
-    public void setActive(boolean active) { this.active = active; }
-
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany (mappedBy = "company", fetch = FetchType.EAGER)
+    private List<QuestionBank> questionBanks;
 }

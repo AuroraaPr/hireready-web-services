@@ -21,12 +21,12 @@ public class Response {
 
     @ManyToOne
     @JoinColumn(name = "simulation_id")
-    private  Simulation simulation;
+    private Simulation simulation;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "question_id")
-    Question question;
+    private Question question;
 
     @OneToOne(mappedBy = "response", fetch = FetchType.EAGER)
-    ResponseAnalysis responseAnalysis;
+    private ResponseAnalysis responseAnalysis;
 }
