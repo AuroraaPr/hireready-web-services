@@ -48,4 +48,16 @@ public class ExceptionController {
                 LocalDateTime.now()
         );
     }
+
+    @ExceptionHandler(ActiveSimulationExistsException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ExceptionMessage activeSimulationException(ActiveSimulationExistsException e, WebRequest r){
+        return new ExceptionMessage(
+                HttpStatus.CONFLICT.value(),
+                e.getClass().getSimpleName(),
+                e.getMessage(),
+                r.getDescription(false),
+                LocalDateTime.now()
+        );
+    }
 }

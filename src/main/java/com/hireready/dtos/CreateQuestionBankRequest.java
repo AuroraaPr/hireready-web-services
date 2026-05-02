@@ -14,7 +14,5 @@ public class CreateQuestionBankRequest {
 
     private List<Long> careerIds;
 
-    private List<QuestionRequest> questions;
-
-    //getter setters
+    private List<QuestionRequestDTO> questions;
 }

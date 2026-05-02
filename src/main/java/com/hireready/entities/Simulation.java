@@ -1,5 +1,6 @@
 package com.hireready.entities;
 
+import com.hireready.enums.SimulationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +22,8 @@ public class Simulation {
 
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private SimulationStatus status;
 
     @ManyToOne
     @JoinColumn(name = "applicant_id")

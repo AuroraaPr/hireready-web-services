@@ -1,6 +1,7 @@
 package com.hireready.repositories;
 
 import com.hireready.entities.Simulation;
+import com.hireready.enums.SimulationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -8,4 +9,5 @@ import java.util.List;
 public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
     List<Simulation> findByQuestionBankId(Long questionBankId);
+    Simulation findByApplicantIdAndStatus(Long applicantId, SimulationStatus status);
 }
