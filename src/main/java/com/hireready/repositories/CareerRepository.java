@@ -1,6 +1,5 @@
 package com.hireready.repositories;
 
-
 import com.hireready.entities.Career;
 import org.springframework.data.jpa.repository.JpaRepository;
 
