@@ -15,6 +15,6 @@ public class ResponseServiceImpl implements ResponseService {
 
     @Override
     public List<Response> findBySimulationId(Long id){
-        return responseRepository.findBySimulationId(id);
+        return responseRepository.findBySimulation_Id(id);
     };
 }

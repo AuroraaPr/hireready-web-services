@@ -5,17 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class SimulationResponseDTO {
+public class ContinueSimulationResponseDTO {
     private Long simulationId;
-    private Long applicantId;
-    private Long questionBankId;
-    private String questionBankName;
     private SimulationStatus status;
-    private LocalDateTime startedAt;
-    private LocalDateTime completedAt;
+    private QuestionResponseDTO pendingQuestion;  // null si todas estan completas
+    private Integer totalQuestions;
+    private Integer answeredQuestions;
 }

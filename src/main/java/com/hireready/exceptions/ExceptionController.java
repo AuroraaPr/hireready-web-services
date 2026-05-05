@@ -49,11 +49,11 @@ public class ExceptionController {
         );
     }
 
-    @ExceptionHandler(ActiveSimulationExistsException.class)
-    @ResponseStatus(value = HttpStatus.CONFLICT)
-    public ExceptionMessage activeSimulationException(ActiveSimulationExistsException e, WebRequest r){
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ExceptionMessage forbiddenException(ForbiddenException e, WebRequest r){
         return new ExceptionMessage(
-                HttpStatus.CONFLICT.value(),
+                HttpStatus.FORBIDDEN.value(),
                 e.getClass().getSimpleName(),
                 e.getMessage(),
                 r.getDescription(false),

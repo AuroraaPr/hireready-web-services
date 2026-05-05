@@ -1,5 +1,7 @@
 package com.hireready.controllers;
 
+import com.hireready.dtos.LoginRequestDTO;
+import com.hireready.dtos.LoginResponseDTO;
 import com.hireready.entities.User;
 import com.hireready.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/v1/users")
+@RequestMapping("/hireready")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return new ResponseEntity<>(userService.register(user), HttpStatus.CREATED);
+    // US03  POST http://localhost:8080/hireready/login
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+        return new ResponseEntity<>(userService.loginAsDto(loginRequestDTO), HttpStatus.OK);
     }
 }

@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
-    List<Simulation> findByQuestionBankId(Long questionBankId);
-    Simulation findByApplicantIdAndStatus(Long applicantId, SimulationStatus status);
+    List<Simulation> findByApplicant_IdAndStatus(Long applicantId, SimulationStatus status);
+    Simulation findFirstByApplicant_IdAndStatusOrderByStartedAtDesc(Long applicantId, SimulationStatus status);
 }

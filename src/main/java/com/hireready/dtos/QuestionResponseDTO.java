@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CompanyUpdateDTO {
-    private String name;
-    private String description;
+public class QuestionResponseDTO {
+    private Long id;
+    private String content;
+    private Integer orderIndex;
 }

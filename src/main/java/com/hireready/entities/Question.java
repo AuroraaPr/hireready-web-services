@@ -1,7 +1,6 @@
 package com.hireready.entities;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,6 @@ public class Question {
     private Long id;
 
     private String content;
-
     private Integer orderIndex;
 
     @ManyToOne

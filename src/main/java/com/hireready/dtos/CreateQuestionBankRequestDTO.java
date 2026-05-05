@@ -1,14 +1,16 @@
 package com.hireready.dtos;
 
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class CreateQuestionBankRequest {
+import lombok.*;
 
-    private String title;
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class CreateQuestionBankRequestDTO {
+
+    private String name;
+    private String description;
     private String jobPosition;
     private String level;
 

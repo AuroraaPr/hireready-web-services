@@ -1,15 +1,15 @@
 package com.hireready.services;
 
-import com.hireready.dtos.CreateQuestionBankRequest;
-import com.hireready.dtos.QuestionBankListResponse;
+import com.hireready.dtos.CreateQuestionBankRequestDTO;
+import com.hireready.dtos.QuestionBankResponseDTO;
+import com.hireready.dtos.QuestionBankSummaryResponseDTO;
 import com.hireready.entities.*;
 
 import java.util.List;
 
 public interface QuestionBankService {
 
-    public QuestionBank createQuestionBank(CreateQuestionBankRequest request);
-    public List<QuestionBank> getAllQuestionBanks();
-    public List<QuestionBankListResponse> listForApplicant();
+    public QuestionBankResponseDTO create(Long companyUserId, CreateQuestionBankRequestDTO createQuestionBankRequestDTO);
     public QuestionBank findById(Long id);
+    List<QuestionBankSummaryResponseDTO> listAvailableForApplicant(Long applicantUserId, String filter);
 }

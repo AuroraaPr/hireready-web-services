@@ -1,6 +1,7 @@
 package com.hireready.controllers;
 
-import com.hireready.dtos.ApplicantDTO;
+import com.hireready.dtos.ApplicantResponseDTO;
+import com.hireready.dtos.RegisterApplicantRequestDTO;
 import com.hireready.dtos.ApplicantUpdateDTO;
 import com.hireready.entities.Applicant;
 import com.hireready.serviceimpl.ApplicantServiceImpl;
@@ -12,18 +13,30 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/applicants")
+@CrossOrigin("*")
+@RequestMapping("/hireready")
 public class ApplicantController {
     @Autowired
     private ApplicantService applicantService;
-    @Autowired private ApplicantServiceImpl applicantServiceimpl;
 
-    @PostMapping("/register")
-    public ResponseEntity<Applicant> signUp(@RequestBody ApplicantDTO dto) {
-        return new ResponseEntity<>(applicantService.register(dto), HttpStatus.CREATED);
+    // US01  POST http://localhost:8080/hireready/applicants
+    @PostMapping("/applicants")
+    public ResponseEntity<ApplicantResponseDTO> register(@RequestBody RegisterApplicantRequestDTO request) {
+        ApplicantResponseDTO response = applicantService.register(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-    @PutMapping("/me") //CON ESTO PODEMOS ACTUALIZAR PERFIL
-    public ResponseEntity<Applicant> updateProfile(@RequestBody ApplicantUpdateDTO dto, Authentication auth) {
-        return ResponseEntity.ok(applicantServiceimpl.updateMe(dto, auth));
+
+    // US05  GET http://localhost:8080/hireready/applicants/{userId}
+    @GetMapping("/applicants/{userId}")
+    public ResponseEntity<ApplicantResponseDTO> getProfile(@PathVariable("userId") Long userId) {
+        return new ResponseEntity<>(applicantService.getProfile(userId), HttpStatus.OK);
+    }
+
+    // US05  PUT http://localhost:8080/hireready/applicants/{userId}
+    @PutMapping("/applicants/{userId}")
+    public ResponseEntity<ApplicantResponseDTO> updateProfile(
+            @PathVariable("userId") Long userId,
+            @RequestBody ApplicantUpdateDTO request) {
+        return new ResponseEntity<>(applicantService.updateProfile(userId, request), HttpStatus.OK);
     }
 }

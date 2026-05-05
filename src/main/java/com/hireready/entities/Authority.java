@@ -1,5 +1,6 @@
 package com.hireready.entities;
 
+import com.hireready.enums.AuthorityRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,8 @@ public class Authority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private AuthorityRole role;
 
     @OneToMany (mappedBy = "authority", fetch = FetchType.EAGER)
     private List<User> users;

@@ -1,7 +1,8 @@
 package com.hireready.controllers;
 
-import com.hireready.dtos.CompanyDTO;
+import com.hireready.dtos.CompanyResponseDTO;
 import com.hireready.dtos.CompanyUpdateDTO;
+import com.hireready.dtos.RegisterCompanyRequestDTO;
 import com.hireready.entities.Company;
 import com.hireready.serviceimpl.CompanyServiceImpl;
 import com.hireready.services.CompanyService;
@@ -13,18 +14,28 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/v1/companies")
+@RequestMapping("/hireready")
 public class CompanyController {
     @Autowired
     private CompanyService companyService;
-    @Autowired private CompanyServiceImpl companyServiceimpl;
 
-    @PostMapping("/register")
-    public ResponseEntity<Company> signUp(@RequestBody CompanyDTO dto) {
-        return new ResponseEntity<>(companyService.register(dto), HttpStatus.CREATED);
+    // US02  POST http://localhost:8080/hireready/companies
+    @PostMapping("/companies")
+    public ResponseEntity<CompanyResponseDTO> register(@RequestBody RegisterCompanyRequestDTO registerCompanyRequestDTO) {
+        return new ResponseEntity<>(companyService.register(registerCompanyRequestDTO), HttpStatus.CREATED);
     }
-    @PutMapping("/me") //CON ESTO PODEMOS ACTUALIZAR PERFIL
-    public ResponseEntity<Company> updateProfile(@RequestBody CompanyUpdateDTO dto, Authentication auth) {
-        return ResponseEntity.ok(companyServiceimpl.updateMe(dto, auth));
+
+    // US05  GET http://localhost:8080/hireready/companies/{userId}
+    @GetMapping("/companies/{userId}")
+    public ResponseEntity<CompanyResponseDTO> getProfile(@PathVariable("userId") Long userId) {
+        return new ResponseEntity<>(companyService.getProfile(userId), HttpStatus.OK);
+    }
+
+    // US05  PUT http://localhost:8080/hireready/companies/{userId}
+    @PutMapping("/companies/{userId}")
+    public ResponseEntity<CompanyResponseDTO> updateProfile(
+            @PathVariable("userId") Long userId,
+            @RequestBody CompanyUpdateDTO companyUpdateDTO) {
+        return new ResponseEntity<>(companyService.updateProfile(userId, companyUpdateDTO), HttpStatus.OK);
     }
 }

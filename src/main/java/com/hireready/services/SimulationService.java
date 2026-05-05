@@ -1,10 +1,11 @@
 package com.hireready.services;
 
+import com.hireready.dtos.ContinueSimulationResponseDTO;
 import com.hireready.dtos.SimulationResponseDTO;
 import com.hireready.dtos.SimulationResumeDTO;
 import com.hireready.dtos.SimulationStartRequestDTO;
 
 public interface SimulationService {
-    public SimulationResponseDTO startSimulation(Long applicantId, SimulationStartRequestDTO simulationStartRequestDTO);
-    public SimulationResumeDTO getActiveSimulationState(Long applicantId);
+    SimulationResponseDTO start(Long applicantUserId, SimulationStartRequestDTO simulationStartRequestDTO);
+    ContinueSimulationResponseDTO continueLatest(Long applicantUserId);
 }

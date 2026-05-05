@@ -1,121 +1,193 @@
 package com.hireready.serviceimpl;
 
-import com.hireready.dtos.CreateQuestionBankRequest;
-import com.hireready.dtos.QuestionBankListResponse;
-import com.hireready.entities.Career;
-import com.hireready.entities.Question;
-import com.hireready.entities.QuestionBank;
-import com.hireready.entities.Simulation;
+import com.hireready.dtos.CreateQuestionBankRequestDTO;
+import com.hireready.dtos.QuestionBankResponseDTO;
+import com.hireready.dtos.QuestionBankSummaryResponseDTO;
+import com.hireready.dtos.QuestionResponseDTO;
+import com.hireready.entities.*;
+import com.hireready.enums.AuthorityRole;
+import com.hireready.enums.SimulationStatus;
+import com.hireready.exceptions.ResourceNotFoundException;
 import com.hireready.repositories.CareerRepository;
 import com.hireready.repositories.QuestionBankRepository;
 import com.hireready.repositories.SimulationRepository;
-import com.hireready.services.QuestionBankService;
+import com.hireready.services.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionBankServiceImpl implements QuestionBankService {
     @Autowired
-    private QuestionBankRepository questionBankRepository;
+    QuestionBankRepository questionBankRepository;
 
     @Autowired
-    private CareerRepository careerRepository;
+    UserService userService;
 
     @Autowired
-    private SimulationRepository simulationRepository;
+    CompanyService companyService;
 
-    // US06 - Crear banco de preguntas
-    @Transactional
-    public QuestionBank createQuestionBank(CreateQuestionBankRequest request) {
+    @Autowired
+    CareerService careerService;
 
-        //  VALIDACIoN 1: preguntas obligatorias
-        if (request.getQuestions() == null || request.getQuestions().isEmpty()) {
-            throw new ValidationException("Debe haber al menos una pregunta");
+    @Autowired
+    QuestionService questionService;
+
+    @Autowired
+    QuestionBankCareerService questionBankCareerService;
+
+    @Autowired
+    ApplicantService applicantService;
+
+    // US06
+    String[] validBankLevels = {
+            "Sin experiencia",
+            "Practicante",
+            "Junior",
+            "Semi Senior",
+            "Senior"
+    };
+
+    // US06
+    @Override
+    public QuestionBankResponseDTO create(Long companyUserId, CreateQuestionBankRequestDTO request) {
+        userService.validateRole(companyUserId, AuthorityRole.COMPANY); // US04
+        Company company = companyService.findByUserId(companyUserId);
+
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new ValidationException("Bank name is required");
         }
-
-        //  VALIDACION 2: careerIds obligatorios
+        if (request.getJobPosition() == null || request.getJobPosition().isBlank()) {
+            throw new ValidationException("Job position is required");
+        }
+        if (request.getLevel() == null || !Arrays.asList(validBankLevels).contains(request.getLevel())) {
+            throw new ValidationException("Bank level is required and must be one of " + Arrays.toString(validBankLevels));
+        }
         if (request.getCareerIds() == null || request.getCareerIds().isEmpty()) {
-            throw new ValidationException("Debe haber al menos una carrera");
+            throw new ValidationException("At least one career must be selected");
+        }
+        if (request.getQuestions() == null || request.getQuestions().isEmpty()) {
+            throw new ValidationException("At least one question is required");
         }
 
-        // OBTENER CAREERS
-        List<Career> careers = careerRepository.findAllById(request.getCareerIds());
-
-        //VALIDACION 3: todas las careers existen
-        if (careers.size() != request.getCareerIds().size()) {
-            throw new ValidationException("Una o más carreras no existen");
+        List<Career> careers = new ArrayList<>();
+        for (Long cid : new HashSet<>(request.getCareerIds())) {
+            careers.add(careerService.findById(cid));
         }
 
-        //CREAR QUESTION BANK
-        QuestionBank qb = new QuestionBank();
-        qb.setTitle(request.getTitle());
-        qb.setJobPosition(request.getJobPosition());
-        qb.setLevel(request.getLevel());
+        QuestionBank bank = new QuestionBank(
+                null,
+                request.getName(),
+                request.getDescription(),
+                request.getJobPosition(),
+                request.getLevel(),
+                company,
+                null,
+                null,
+                null
+        );
+        bank = questionBankRepository.save(bank);
 
-        // CLAVE: agregar careers correctamente
-        qb.getCareers().addAll(careers);
+        List<QuestionBankCareer> qbcs = questionBankCareerService.link(bank, careers);
+        List<Question> questions = questionService.bulkCreate(bank, request.getQuestions());
 
-        //CREAR QUESTIONS
-        List<Question> questions = request.getQuestions().stream().map(q -> {
-            Question question = new Question();
-            question.setContent(q.getContent());
-            question.setOrderIndex(q.getOrderIndex());
-            question.setQuestionBank(qb);
-            return question;
-        }).toList();
+        bank.setQuestionBankCareers(qbcs);
+        bank.setQuestions(questions);
 
-        qb.setQuestions(questions);
-
-        // GUARDAR TODO
-        QuestionBank saved = questionBankRepository.save(qb);
-
-        // recargar desde BD para traer relaciones
-        return questionBankRepository.findById(saved.getId()).orElseThrow();
+        return toFullResponse(bank);
     }
 
-    //US07 - Listar bancos
-    public List<QuestionBank> getAllQuestionBanks() {
-        return questionBankRepository.findAll();
+    // US09
+    @Override
+    public QuestionBank findById(Long id) {
+        QuestionBank bank = questionBankRepository.findById(id).orElse(null);
+        if (bank == null) {
+            throw new ResourceNotFoundException("QuestionBank id: " + id + " not found");
+        }
+        return bank;
     }
 
-    public List<QuestionBankListResponse> listForApplicant() {
+    // US07 y US08
+    @Override
+    public List<QuestionBankSummaryResponseDTO> listAvailableForApplicant(Long applicantUserId, String filter) {
+        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT); // US04
+        Applicant applicant = applicantService.findByUserId(applicantUserId);
 
-        return questionBankRepository.findAll().stream().map(qb -> {
+        List<QuestionBank> banks;
+        if ("recommended".equalsIgnoreCase(filter)) {
+            // US08
+            if (applicant.getCareer() == null) {
+                return new ArrayList<>();
+            }
+            banks = questionBankRepository.findByCareerId(applicant.getCareer().getId());
+        } else {
+            // US07/US08
+            banks = questionBankRepository.findAll();
+        }
 
-            QuestionBankListResponse res = new QuestionBankListResponse();
+        List<QuestionBankSummaryResponseDTO> result = new ArrayList<>();
+        for (QuestionBank bank : banks) {
+            result.add(toSummary(bank, applicant));
+        }
+        return result;
+    }
 
-            res.setId(qb.getId());
-            res.setTitle(qb.getTitle());
-            res.setJobPosition(qb.getJobPosition());
-            res.setLevel(qb.getLevel());
+    private QuestionBankResponseDTO toFullResponse(QuestionBank b) {
+        List<Long> careerIds = new ArrayList<>();
+        List<String> careerNames = new ArrayList<>();
+        if (b.getQuestionBankCareers() != null) {
+            for (QuestionBankCareer qbc : b.getQuestionBankCareers()) {
+                careerIds.add(qbc.getCareer().getId());
+                careerNames.add(qbc.getCareer().getName());
+            }
+        }
+        List<QuestionResponseDTO> qs = new ArrayList<>();
+        if (b.getQuestions() != null) {
+            for (Question q : b.getQuestions()) {
+                qs.add(new QuestionResponseDTO(q.getId(), q.getContent(), q.getOrderIndex()));
+            }
+        }
+        return new QuestionBankResponseDTO(
+                b.getId(), b.getName(), b.getDescription(), b.getJobPosition(), b.getLevel(),
+                b.getCompany().getId(), b.getCompany().getName(),
+                careerIds, careerNames, qs
+        );
+    }
 
-            var simulations = simulationRepository.findByQuestionBankId(qb.getId());
+    // US07
+    private QuestionBankSummaryResponseDTO toSummary(QuestionBank b, Applicant applicant) {
+        List<String> careerNames = new ArrayList<>();
+        if (b.getQuestionBankCareers() != null) {
+            careerNames = b.getQuestionBankCareers().stream()
+                    .map(qbc -> qbc.getCareer().getName())
+                    .collect(Collectors.toList());
+        }
+        int numQuestions = b.getQuestions() == null ? 0 : b.getQuestions().size();
 
-            if (simulations.isEmpty()) {
-                res.setStatus("NOT_STARTED");
-                res.setActions(java.util.List.of("Iniciar"));
-            } else {
-                boolean allCompleted = simulations.stream().allMatch(Simulation::isCompleted);
-
-                if (allCompleted) {
-                    res.setStatus("COMPLETED");
-                    res.setActions(java.util.List.of("Iniciar"));
-                } else {
-                    res.setStatus("IN_PROGRESS");
-                    res.setActions(java.util.List.of("Continuar", "Iniciar"));
+        String status = "NOT_STARTED";
+        if (b.getSimulations() != null) {
+            boolean hasInProgress = false;
+            boolean hasCompleted = false;
+            for (Simulation s : b.getSimulations()) {
+                if (s.getApplicant() != null && s.getApplicant().getId().equals(applicant.getId())) {
+                    if (s.getStatus() == SimulationStatus.IN_PROGRESS) hasInProgress = true;
+                    if (s.getStatus() == SimulationStatus.COMPLETED) hasCompleted = true;
                 }
             }
+            if (hasInProgress) status = "IN_PROGRESS";
+            else if (hasCompleted) status = "COMPLETED";
+        }
 
-            res.setQuestionCount(qb.getQuestions().size());
-            res.setCompanyName("Sin empresa");
-
-            return res;
-
-        }).toList();
-
+        return new QuestionBankSummaryResponseDTO(
+                b.getId(), b.getName(),
+                b.getCompany() != null ? b.getCompany().getName() : null,
+                b.getDescription(), b.getJobPosition(), b.getLevel(),
+                careerNames, numQuestions, status
+        );
     }
 }

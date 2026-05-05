@@ -19,14 +19,14 @@ public class Applicant {
     private Long id;
     private String name;
     private LocalDate bornDate;
-    private String level_study;
+    private String levelStudy;
     private String university;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "career_id")
     private Career career;
 
