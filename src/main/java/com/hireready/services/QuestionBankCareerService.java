@@ -7,5 +7,5 @@ import com.hireready.entities.QuestionBankCareer;
 import java.util.List;
 
 public interface QuestionBankCareerService {
-    List<QuestionBankCareer> link(QuestionBank bank, List<Career> careers);
+    public List<QuestionBankCareer> link(QuestionBank bank, List<Career> careers);
 }

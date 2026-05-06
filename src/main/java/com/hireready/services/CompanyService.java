@@ -7,7 +7,7 @@ import com.hireready.entities.Company;
 
 public interface CompanyService {
     public CompanyResponseDTO register(RegisterCompanyRequestDTO registerCompanyRequestDTO);
-    Company findByUserId(Long userId);
-    CompanyResponseDTO getProfile(Long userId);
-    CompanyResponseDTO updateProfile(Long userId, CompanyUpdateDTO companyUpdateDTO);
+    public Company findByUserId(Long userId);
+    public CompanyResponseDTO getProfile(Long userId);
+    public CompanyResponseDTO updateProfile(Long userId, CompanyUpdateDTO companyUpdateDTO);
 }

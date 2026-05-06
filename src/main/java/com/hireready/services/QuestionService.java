@@ -7,6 +7,6 @@ import com.hireready.entities.QuestionBank;
 import java.util.List;
 
 public interface QuestionService {
-    List<Question> bulkCreate(QuestionBank bank, List<QuestionRequestDTO> requests);
-    List<Question> listByBankOrdered(Long questionBankId);
+    public List<Question> bulkCreate(QuestionBank bank, List<QuestionRequestDTO> requests);
+    public List<Question> listByBankOrdered(Long questionBankId);
 }

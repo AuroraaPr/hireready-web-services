@@ -8,17 +8,16 @@ import com.hireready.entities.*;
 import com.hireready.enums.AuthorityRole;
 import com.hireready.enums.SimulationStatus;
 import com.hireready.exceptions.ResourceNotFoundException;
-import com.hireready.repositories.CareerRepository;
 import com.hireready.repositories.QuestionBankRepository;
-import com.hireready.repositories.SimulationRepository;
 import com.hireready.services.*;
-import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service

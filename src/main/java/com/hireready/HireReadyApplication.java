@@ -36,6 +36,7 @@ public class HireReadyApplication {
             // Según tu Authority.java, usa el enum AuthorityRole
             Authority authApplicant = authorityRepository.save(new Authority(null, AuthorityRole.APPLICANT, null));
             Authority authCompany = authorityRepository.save(new Authority(null, AuthorityRole.COMPANY, null));
+            Authority authAdmin = authorityRepository.save(new Authority(null, AuthorityRole.ADMIN, null));
             System.out.println("---- Autoridades creadas ----");
 
             // 2. Crear Usuarios (Se necesitan para Applicant y Company)

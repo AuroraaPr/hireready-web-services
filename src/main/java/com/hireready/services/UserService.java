@@ -6,11 +6,11 @@ import com.hireready.entities.User;
 import com.hireready.enums.AuthorityRole;
 
 public interface UserService {
-    User add(User user);
-    User findById(Long id);
-    User findByEmail(String email);
+    public User add(User user);
+    public User findById(Long id);
+    public User findByEmail(String email);
     public Boolean existsByEmail(String email);
-    User login(String email, String password);
-    void validateRole(Long userId, AuthorityRole expectedRole);
-    LoginResponseDTO loginAsDto(LoginRequestDTO loginRequestDTO);
+    public User login(String email, String password);
+    public void validateRole(Long userId, AuthorityRole expectedRole);
+    public LoginResponseDTO loginAsDto(LoginRequestDTO loginRequestDTO);
 }

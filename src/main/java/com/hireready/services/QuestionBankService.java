@@ -11,5 +11,5 @@ public interface QuestionBankService {
 
     public QuestionBankResponseDTO create(Long companyUserId, CreateQuestionBankRequestDTO createQuestionBankRequestDTO);
     public QuestionBank findById(Long id);
-    List<QuestionBankSummaryResponseDTO> listAvailableForApplicant(Long applicantUserId, String filter);
+    public List<QuestionBankSummaryResponseDTO> listAvailableForApplicant(Long applicantUserId, String filter);
 }

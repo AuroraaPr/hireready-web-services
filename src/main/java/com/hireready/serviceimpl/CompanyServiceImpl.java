@@ -10,13 +10,11 @@ import com.hireready.enums.AuthorityRole;
 import com.hireready.exceptions.ResourceNotFoundException;
 import com.hireready.exceptions.ValidationException;
 import com.hireready.repositories.CompanyRepository;
-import com.hireready.repositories.UserRepository;
 import com.hireready.services.AuthorityService;
 import com.hireready.services.CompanyService;
 import com.hireready.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service

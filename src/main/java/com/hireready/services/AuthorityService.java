@@ -4,5 +4,5 @@ import com.hireready.entities.Authority;
 import com.hireready.enums.AuthorityRole;
 
 public interface AuthorityService {
-    Authority findByRole(AuthorityRole authorityRole);
+    public Authority findByRole(AuthorityRole authorityRole);
 }

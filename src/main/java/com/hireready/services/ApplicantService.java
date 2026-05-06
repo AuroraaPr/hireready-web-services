@@ -8,6 +8,6 @@ import com.hireready.entities.Applicant;
 public interface ApplicantService {
     public ApplicantResponseDTO register(RegisterApplicantRequestDTO applicantRequestDTO);
     public Applicant findByUserId(Long userId);
-    ApplicantResponseDTO getProfile(Long userId);
-    ApplicantResponseDTO updateProfile(Long userId, ApplicantUpdateDTO applicantUpdateDTO);
+    public ApplicantResponseDTO getProfile(Long userId);
+    public ApplicantResponseDTO updateProfile(Long userId, ApplicantUpdateDTO applicantUpdateDTO);
 }
