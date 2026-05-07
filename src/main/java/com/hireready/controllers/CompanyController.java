@@ -1,5 +1,6 @@
 package com.hireready.controllers;
 
+import com.hireready.dtos.CompanyDashboardDTO;
 import com.hireready.dtos.CompanyResponseDTO;
 import com.hireready.dtos.CompanyUpdateDTO;
 import com.hireready.dtos.RegisterCompanyRequestDTO;
@@ -45,5 +46,11 @@ public class CompanyController {
     @GetMapping("/all")
     public ResponseEntity<List<Company>> getAllCompanies() {
         return new ResponseEntity<>(companyService.getAllCompanies(), HttpStatus.OK);
+    }
+
+    // US23 GET http://localhost:8080/hireready/companies/dashboard/{id}
+    @GetMapping("/dashboard/{id}")
+    public ResponseEntity<CompanyDashboardDTO> getDashboard(@PathVariable Long id) {
+        return new ResponseEntity<>(companyService.getCompanyDashboard(id), HttpStatus.OK);
     }
 }

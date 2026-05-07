@@ -15,4 +15,12 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
     // US-22
     @Query("SELECT COUNT(s), AVG(s.score), MAX(s.score) FROM Simulation s WHERE s.applicant.id = :applicantId")
     Object[] getApplicantBasicMetrics(Long applicantId);
+
+    // US-23: Obtener métricas base para la empresa vinculando a través del banco de preguntas
+    @Query("SELECT COUNT(s), AVG(s.score) FROM Simulation s JOIN s.questionBank q WHERE q.company.id = :companyId")
+    Object[] getCompanyBasicMetrics(Long companyId);
+
+    // US-23: Obtener distribución de postulantes por carrera para una empresa
+    @Query("SELECT s.applicant.career, COUNT(s) FROM Simulation s JOIN s.questionBank q WHERE q.company.id = :companyId GROUP BY s.applicant.career")
+    List<Object[]> getCareerDistributionByCompany(Long companyId);
 }

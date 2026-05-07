@@ -1,8 +1,6 @@
 package com.hireready.serviceimpl;
 
-import com.hireready.dtos.CompanyResponseDTO;
-import com.hireready.dtos.CompanyUpdateDTO;
-import com.hireready.dtos.RegisterCompanyRequestDTO;
+import com.hireready.dtos.*;
 import com.hireready.entities.Authority;
 import com.hireready.entities.Company;
 import com.hireready.entities.User;
@@ -10,6 +8,7 @@ import com.hireready.enums.AuthorityRole;
 import com.hireready.exceptions.ResourceNotFoundException;
 import com.hireready.exceptions.ValidationException;
 import com.hireready.repositories.CompanyRepository;
+import com.hireready.repositories.SimulationRepository;
 import com.hireready.services.AuthorityService;
 import com.hireready.services.CompanyService;
 import com.hireready.services.UserService;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -121,4 +121,27 @@ public class CompanyServiceImpl implements CompanyService {
     public List<Company> getAllCompanies() {
         return companyRepository.findAll();
     }
+
+    //US-23
+    @Autowired
+    private SimulationRepository simulationRepository;
+
+    @Override
+    public CompanyDashboardDTO getCompanyDashboard(Long companyId) {
+        Object[] metrics = simulationRepository.getCompanyBasicMetrics(companyId);
+        CompanyDashboardDTO dto = new CompanyDashboardDTO();
+
+        if (metrics != null && (Long)metrics[0] > 0) {
+            dto.setTotalSimulationsPerCompany((Long)metrics[0]);
+            dto.setGeneralAverageScore((Double)metrics[1]);
+
+            List<CareerMetricDTO> careers = simulationRepository.getCareerDistributionByCompany(companyId)
+                    .stream()
+                    .map(obj -> new CareerMetricDTO((String)obj[0], (Long)obj[1]))
+                    .collect(Collectors.toList());
+            dto.setCareerDistribution(careers);
+        }
+        return dto;
+    }
 }
+
