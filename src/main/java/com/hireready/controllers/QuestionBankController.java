@@ -1,5 +1,6 @@
 package com.hireready.controllers;
 
+import com.hireready.dtos.QuestionBankDetailResponseDTO;
 import com.hireready.dtos.QuestionBankResponseDTO;
 import com.hireready.dtos.CreateQuestionBankRequestDTO;
 import com.hireready.dtos.QuestionBankSummaryResponseDTO;
@@ -38,5 +39,15 @@ public class QuestionBankController {
             @RequestParam(value = "filter", defaultValue = "all") String filter) {
         return new ResponseEntity<>(
                 questionBankService.listAvailableForApplicant(applicantUserId, filter), HttpStatus.OK);
+    }
+    //US21
+    //GET http://localhost:8080/hireready-banks/question-banks/{questionBankId}
+    @GetMapping("/question-banks/{questionBankId}")
+    public ResponseEntity<QuestionBankDetailResponseDTO> getQuestionBankById(
+            @PathVariable("questionBankId") Long questionBankId) {
+
+        return ResponseEntity.ok(
+                questionBankService.getQuestionBankById(questionBankId)
+        );
     }
 }

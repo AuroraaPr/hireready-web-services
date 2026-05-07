@@ -4,6 +4,8 @@ import com.hireready.dtos.CreateQuestionBankRequestDTO;
 import com.hireready.dtos.QuestionBankResponseDTO;
 import com.hireready.dtos.QuestionBankSummaryResponseDTO;
 import com.hireready.dtos.QuestionResponseDTO;
+import com.hireready.dtos.QuestionBankDetailResponseDTO;
+import com.hireready.dtos.QuestionDetailResponseDTO;
 import com.hireready.entities.*;
 import com.hireready.enums.AuthorityRole;
 import com.hireready.enums.SimulationStatus;
@@ -16,9 +18,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 public class QuestionBankServiceImpl implements QuestionBankService {
@@ -188,5 +192,41 @@ public class QuestionBankServiceImpl implements QuestionBankService {
                 b.getDescription(), b.getJobPosition(), b.getLevel(),
                 careerNames, numQuestions, status
         );
+    }
+
+    //US21
+    @Override
+    public QuestionBankDetailResponseDTO getQuestionBankById(Long id) {
+
+        QuestionBank questionBank = questionBankRepository.findById(id).orElse(null);
+
+        if (questionBank == null) {
+            throw new RuntimeException("Question bank not found");
+        }
+
+        QuestionBankDetailResponseDTO response = new QuestionBankDetailResponseDTO();
+
+        response.setId(questionBank.getId());
+        response.setTitle(questionBank.getName());
+        response.setJobPosition(questionBank.getJobPosition());
+        response.setLevel(questionBank.getLevel());
+
+        List<QuestionDetailResponseDTO> questions = questionBank.getQuestions()
+                .stream()
+                .sorted(Comparator.comparing(Question::getOrderIndex))
+                .map(question -> {
+
+                    QuestionDetailResponseDTO dto = new QuestionDetailResponseDTO();
+
+                    dto.setId(question.getId());
+                    dto.setContent(question.getContent());
+                    dto.setOrderIndex(question.getOrderIndex());
+
+                    return dto;
+                }).toList();
+
+        response.setQuestions(questions);
+
+        return response;
     }
 }
