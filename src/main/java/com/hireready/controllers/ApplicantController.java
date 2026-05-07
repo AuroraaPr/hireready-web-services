@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/hireready")
@@ -38,5 +40,11 @@ public class ApplicantController {
             @PathVariable("userId") Long userId,
             @RequestBody ApplicantUpdateDTO request) {
         return new ResponseEntity<>(applicantService.updateProfile(userId, request), HttpStatus.OK);
+    }
+
+    // US-17: GET http://localhost:8080/hireready/applicants/all
+    @GetMapping("/all")
+    public ResponseEntity<List<Applicant>> getAllApplicants() {
+        return new ResponseEntity<>(applicantService.getAllApplicants(), HttpStatus.OK);
     }
 }

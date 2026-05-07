@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class ApplicantServiceImpl implements ApplicantService {
@@ -169,5 +170,10 @@ public class ApplicantServiceImpl implements ApplicantService {
                 a.getLevelStudy(),
                 a.getUniversity()
         );
+    }
+
+    @Override
+    public List<Applicant> getAllApplicants() {
+        return applicantRepository.findAll();
     }
 }
