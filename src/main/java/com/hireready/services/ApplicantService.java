@@ -1,5 +1,6 @@
 package com.hireready.services;
 
+import com.hireready.dtos.ApplicantDashboardDTO;
 import com.hireready.dtos.ApplicantResponseDTO;
 import com.hireready.dtos.ApplicantUpdateDTO;
 import com.hireready.dtos.RegisterApplicantRequestDTO;
@@ -14,4 +15,7 @@ public interface ApplicantService {
     public ApplicantResponseDTO updateProfile(Long userId, ApplicantUpdateDTO applicantUpdateDTO);
 
     List<Applicant> getAllApplicants();
+
+    // US22
+    ApplicantDashboardDTO getApplicantDashboard(Long applicantId);
 }

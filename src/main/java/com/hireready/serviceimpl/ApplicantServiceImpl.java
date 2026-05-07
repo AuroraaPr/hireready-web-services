@@ -1,8 +1,6 @@
 package com.hireready.serviceimpl;
 
-import com.hireready.dtos.ApplicantResponseDTO;
-import com.hireready.dtos.ApplicantUpdateDTO;
-import com.hireready.dtos.RegisterApplicantRequestDTO;
+import com.hireready.dtos.*;
 import com.hireready.entities.Applicant;
 import com.hireready.entities.Authority;
 import com.hireready.entities.Career;
@@ -11,6 +9,7 @@ import com.hireready.enums.AuthorityRole;
 import com.hireready.exceptions.ResourceNotFoundException;
 import com.hireready.exceptions.ValidationException;
 import com.hireready.repositories.ApplicantRepository;
+import com.hireready.repositories.SimulationRepository;
 import com.hireready.services.ApplicantService;
 import com.hireready.services.AuthorityService;
 import com.hireready.services.CareerService;
@@ -21,8 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ApplicantServiceImpl implements ApplicantService {
@@ -176,5 +177,24 @@ public class ApplicantServiceImpl implements ApplicantService {
     @Override
     public List<Applicant> getAllApplicants() {
         return applicantRepository.findAll();
+    }
+
+    //US22
+    @Autowired
+    private SimulationRepository simulationRepository;
+    @Override
+    public ApplicantDashboardDTO getApplicantDashboard(Long applicantId) {
+        Object[] metrics = simulationRepository.getApplicantBasicMetrics(applicantId);
+        ApplicantDashboardDTO dto = new ApplicantDashboardDTO();
+
+        if (metrics != null && (Long)metrics[0] > 0) {
+            dto.setTotalSimulations((Long)metrics[0]);
+            dto.setAverageScore((Double)metrics[1]);
+            dto.setBestScore((Double)metrics[2]);
+
+            dto.setScoreEvolution(new ArrayList<>());
+            dto.setFillerWords(new ArrayList<>());
+        }
+        return dto;
     }
 }

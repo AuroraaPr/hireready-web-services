@@ -1,5 +1,6 @@
 package com.hireready.controllers;
 
+import com.hireready.dtos.ApplicantDashboardDTO;
 import com.hireready.dtos.ApplicantResponseDTO;
 import com.hireready.dtos.RegisterApplicantRequestDTO;
 import com.hireready.dtos.ApplicantUpdateDTO;
@@ -46,5 +47,11 @@ public class ApplicantController {
     @GetMapping("/all")
     public ResponseEntity<List<Applicant>> getAllApplicants() {
         return new ResponseEntity<>(applicantService.getAllApplicants(), HttpStatus.OK);
+    }
+
+    // US-22: GET http://localhost:8080/hireready/applicants/dashboard/{id}
+    @GetMapping("/dashboard/{id}")
+    public ResponseEntity<ApplicantDashboardDTO> getDashboard(@PathVariable Long id) {
+        return new ResponseEntity<>(applicantService.getApplicantDashboard(id), HttpStatus.OK);
     }
 }
