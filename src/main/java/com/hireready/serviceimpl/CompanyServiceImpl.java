@@ -17,6 +17,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CompanyServiceImpl implements CompanyService {
     @Autowired
@@ -112,5 +114,11 @@ public class CompanyServiceImpl implements CompanyService {
                 c.getName(),
                 c.getDescription()
         );
+    }
+
+    // US-18
+    @Override
+    public List<Company> getAllCompanies() {
+        return companyRepository.findAll();
     }
 }

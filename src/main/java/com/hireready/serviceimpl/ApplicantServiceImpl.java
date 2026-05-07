@@ -172,6 +172,7 @@ public class ApplicantServiceImpl implements ApplicantService {
         );
     }
 
+    // US18
     @Override
     public List<Applicant> getAllApplicants() {
         return applicantRepository.findAll();
