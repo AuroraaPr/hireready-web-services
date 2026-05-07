@@ -194,6 +194,54 @@ public class QuestionBankServiceImpl implements QuestionBankService {
         );
     }
 
+
+    //20
+    @Override
+    public List<QuestionBankSummaryResponseDTO> getAllQuestionBanks(Long companyId) {
+
+        List<QuestionBank> questionBanks;
+
+        if (companyId == null) {
+            questionBanks = questionBankRepository.findAll();
+        } else {
+            questionBanks = questionBankRepository.findAll()
+                    .stream()
+                    .filter(questionBank ->
+                            questionBank.getCompany() != null &&
+                                    questionBank.getCompany().getId().equals(companyId))
+                    .toList();
+        }
+
+        List<QuestionBankSummaryResponseDTO> response = new ArrayList<>();
+
+        for (QuestionBank questionBank : questionBanks) {
+
+            QuestionBankSummaryResponseDTO dto =
+                    new QuestionBankSummaryResponseDTO();
+
+            dto.setId(questionBank.getId());
+            dto.setName(questionBank.getName());
+
+            if (questionBank.getCompany() != null) {
+                dto.setCompanyName(questionBank.getCompany().getName());
+            }
+
+            dto.setDescription(questionBank.getDescription());
+            dto.setJobPosition(questionBank.getJobPosition());
+            dto.setLevel(questionBank.getLevel());
+
+            if (questionBank.getQuestions() != null) {
+                dto.setNumQuestions(questionBank.getQuestions().size());
+            } else {
+                dto.setNumQuestions(0);
+            }
+
+            response.add(dto);
+        }
+
+        return response;
+    }
+
     //US21
     @Override
     public QuestionBankDetailResponseDTO getQuestionBankById(Long id) {
@@ -229,4 +277,5 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 
         return response;
     }
+
 }

@@ -40,6 +40,20 @@ public class QuestionBankController {
         return new ResponseEntity<>(
                 questionBankService.listAvailableForApplicant(applicantUserId, filter), HttpStatus.OK);
     }
+
+    //US20
+    //GET http://localhost:8080/hireready-banks/question-banks
+    //GET http://localhost:8080/hireready-banks/question-banks?companyId=1
+    @GetMapping("/question-banks")
+    public ResponseEntity<List<QuestionBankSummaryResponseDTO>> getAllQuestionBanks(
+            @RequestParam(required = false) Long companyId) {
+
+        return ResponseEntity.ok(
+                questionBankService.getAllQuestionBanks(companyId)
+        );
+    }
+
+
     //US21
     //GET http://localhost:8080/hireready-banks/question-banks/{questionBankId}
     @GetMapping("/question-banks/{questionBankId}")

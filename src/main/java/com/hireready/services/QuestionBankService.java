@@ -14,5 +14,6 @@ public interface QuestionBankService {
     public QuestionBank findById(Long id);
     public List<QuestionBankSummaryResponseDTO> listAvailableForApplicant(Long applicantUserId, String filter);
     public QuestionBankDetailResponseDTO getQuestionBankById(Long id);
+    public List<QuestionBankSummaryResponseDTO> getAllQuestionBanks(Long companyId);
 
 }
