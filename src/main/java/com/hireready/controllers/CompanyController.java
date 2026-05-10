@@ -43,7 +43,7 @@ public class CompanyController {
     }
 
     // US18 GET http://localhost:8080/hireready/companies/all
-    @GetMapping("/all")
+    @GetMapping("/companies/all")
     public ResponseEntity<List<Company>> getAllCompanies() {
         return new ResponseEntity<>(companyService.getAllCompanies(), HttpStatus.OK);
     }

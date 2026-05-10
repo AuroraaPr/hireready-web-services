@@ -2,6 +2,8 @@ package com.hireready.serviceimpl;
 
 import com.hireready.dtos.LoginRequestDTO;
 import com.hireready.dtos.LoginResponseDTO;
+import com.hireready.dtos.UserDTO;
+import com.hireready.entities.Authority;
 import com.hireready.entities.User;
 import com.hireready.enums.AuthorityRole;
 import com.hireready.exceptions.DuplicateResourceException;
@@ -9,14 +11,24 @@ import com.hireready.exceptions.ForbiddenException;
 import com.hireready.exceptions.ResourceNotFoundException;
 import com.hireready.exceptions.ValidationException;
 import com.hireready.repositories.UserRepository;
+import com.hireready.services.AuthorityService;
 import com.hireready.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
+
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    AuthorityService authorityService;
 
     // US04 y US05
     @Override
@@ -28,23 +40,30 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    private List<Authority> authoritiesFromString(String authorities) {
+
+        List<Authority> authorityList = new ArrayList<>();
+        List<String> authorityStringList = Arrays.stream(authorities.split(";")).toList();
+        for (String authorityString : authorityStringList) {
+            Authority authority = authorityService.findByRole(authorityString);
+            if (authority != null) {
+                authorityList.add(authority);
+            }
+        }
+        return authorityList;
+    }
+
     // US01 y US02
     @Override
-    public User add(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new ValidationException("User email can not be blank");
-        }
-        if (user.getPassword() == null || user.getPassword().isBlank()) {
-            throw new ValidationException("User password can not be blank");
-        }
-        if (user.getAuthority() == null) {
-            throw new ValidationException("User authority can not be null");
-        }
-        if (userRepository.findByEmail(user.getEmail()) != null) {
-            throw new DuplicateResourceException("Email " + user.getEmail() + " is already registered");
-        }
-        if (user.getEnabled() == null) user.setEnabled(true);
-        return userRepository.save(user);
+    public UserDTO add(UserDTO userDTO) {
+        List<Authority> authorityList = authoritiesFromString(userDTO.getAuthorities());
+
+        User newUser = new User(null, userDTO.getEmail(),
+                new BCryptPasswordEncoder().encode(userDTO.getPassword()), false, authorityList);
+
+        newUser = userRepository.save(newUser);
+        userDTO.setId(newUser.getId());
+        return userDTO;
     }
 
     // US01, US02, US03

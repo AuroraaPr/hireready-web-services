@@ -44,7 +44,7 @@ public class ApplicantController {
     }
 
     // US-17: GET http://localhost:8080/hireready/applicants/all
-    @GetMapping("/all")
+    @GetMapping("/applicant/all")
     public ResponseEntity<List<Applicant>> getAllApplicants() {
         return new ResponseEntity<>(applicantService.getAllApplicants(), HttpStatus.OK);
     }

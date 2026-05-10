@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -19,9 +21,31 @@ public class User {
     private String password;
     private Boolean enabled;
 
+    /*
     @ManyToOne
     @JoinColumn(name="authority_id")
     private Authority authority;
+    */
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name="user_authorities",
+            joinColumns = {
+                    @JoinColumn(
+                            name = "user_id",
+                            referencedColumnName = "id",
+                            nullable = false
+                    )
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(
+                            name = "authority_id",
+                            referencedColumnName = "id",
+                            nullable = false
+                    )
+            }
+    )
+    private List<Authority> authorities;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private Applicant applicant;
