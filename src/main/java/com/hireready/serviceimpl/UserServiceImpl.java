@@ -2,6 +2,7 @@ package com.hireready.serviceimpl;
 
 import com.hireready.dtos.LoginRequestDTO;
 import com.hireready.dtos.LoginResponseDTO;
+import com.hireready.dtos.UserStatusResponseDTO;
 import com.hireready.entities.User;
 import com.hireready.enums.AuthorityRole;
 import com.hireready.exceptions.DuplicateResourceException;
@@ -96,6 +97,26 @@ public class UserServiceImpl implements UserService {
                 user.getAuthority().getRole(),
                 applicantId,
                 companyId
+        );
+    }
+
+    // US19
+    @Override
+    public UserStatusResponseDTO setEnabled(Long adminUserId, Long targetUserId, boolean enabled) {
+        validateRole(adminUserId, AuthorityRole.ADMIN);
+        if (adminUserId.equals(targetUserId)) {
+            throw new ValidationException("Admin cannot change their own active status");
+        }
+        User target = findById(targetUserId);
+        if (target.getAuthority() != null && target.getAuthority().getRole() == AuthorityRole.ADMIN) {
+            throw new ValidationException("Cannot deactivate or activate another admin account");
+        }
+        target.setEnabled(enabled);
+        target = userRepository.save(target);
+        return new UserStatusResponseDTO(
+                target.getId(), target.getEmail(),
+                target.getAuthority() != null ? target.getAuthority().getRole() : null,
+                target.getEnabled()
         );
     }
 }

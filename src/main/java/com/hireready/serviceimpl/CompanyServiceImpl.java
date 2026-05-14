@@ -1,6 +1,7 @@
 package com.hireready.serviceimpl;
 
 import com.hireready.dtos.CompanyResponseDTO;
+import com.hireready.dtos.CompanySummaryResponseDTO;
 import com.hireready.dtos.CompanyUpdateDTO;
 import com.hireready.dtos.RegisterCompanyRequestDTO;
 import com.hireready.entities.Authority;
@@ -16,6 +17,9 @@ import com.hireready.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -102,6 +106,25 @@ public class CompanyServiceImpl implements CompanyService {
         }
         company = companyRepository.save(company);
         return toResponse(company);
+    }
+
+    // US18
+    @Override
+    public List<CompanySummaryResponseDTO> listAll(Long adminUserId) {
+        userService.validateRole(adminUserId, AuthorityRole.ADMIN);
+        List<CompanySummaryResponseDTO> result = new ArrayList<>();
+        for (Company c : companyRepository.findAll()) {
+            result.add(new CompanySummaryResponseDTO(
+                    c.getId(),
+                    c.getUser() != null ? c.getUser().getId() : null,
+                    c.getUser() != null ? c.getUser().getEmail() : null,
+                    c.getName(),
+                    c.getDescription(),
+                    c.getUser() != null ? c.getUser().getEnabled() : null,
+                    c.getQuestionBanks() != null ? c.getQuestionBanks().size() : 0
+            ));
+        }
+        return result;
     }
 
     private CompanyResponseDTO toResponse(Company c) {

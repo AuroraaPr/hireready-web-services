@@ -1,6 +1,7 @@
 package com.hireready.controllers;
 
 import com.hireready.dtos.CompanyResponseDTO;
+import com.hireready.dtos.CompanySummaryResponseDTO;
 import com.hireready.dtos.CompanyUpdateDTO;
 import com.hireready.dtos.RegisterCompanyRequestDTO;
 import com.hireready.entities.Company;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin("*")
@@ -37,5 +40,12 @@ public class CompanyController {
             @PathVariable("userId") Long userId,
             @RequestBody CompanyUpdateDTO companyUpdateDTO) {
         return new ResponseEntity<>(companyService.updateProfile(userId, companyUpdateDTO), HttpStatus.OK);
+    }
+
+    // US18  GET http://localhost:8080/hireready/admin/{userId}/companies
+    @GetMapping("/admin/{userId}/companies")
+    public ResponseEntity<List<CompanySummaryResponseDTO>> listAll(
+            @PathVariable("userId") Long adminUserId) {
+        return new ResponseEntity<>(companyService.listAll(adminUserId), HttpStatus.OK);
     }
 }

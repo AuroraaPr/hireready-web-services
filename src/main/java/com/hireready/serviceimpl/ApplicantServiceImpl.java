@@ -1,6 +1,7 @@
 package com.hireready.serviceimpl;
 
 import com.hireready.dtos.ApplicantResponseDTO;
+import com.hireready.dtos.ApplicantSummaryResponseDTO;
 import com.hireready.dtos.ApplicantUpdateDTO;
 import com.hireready.dtos.RegisterApplicantRequestDTO;
 import com.hireready.entities.Applicant;
@@ -21,7 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class ApplicantServiceImpl implements ApplicantService {
@@ -155,6 +158,27 @@ public class ApplicantServiceImpl implements ApplicantService {
 
         applicant = applicantRepository.save(applicant);
         return toResponse(applicant);
+    }
+
+    @Override
+    public List<ApplicantSummaryResponseDTO> listAll(Long adminUserId) {
+        userService.validateRole(adminUserId, AuthorityRole.ADMIN); // US-04
+        List<ApplicantSummaryResponseDTO> result = new ArrayList<>();
+        for (Applicant a : applicantRepository.findAll()) {
+            result.add(new ApplicantSummaryResponseDTO(
+                    a.getId(),
+                    a.getUser() != null ? a.getUser().getId() : null,
+                    a.getUser() != null ? a.getUser().getEmail() : null,
+                    a.getName(),
+                    a.getBornDate(),
+                    a.getCareer() != null ? a.getCareer().getName() : null,
+                    a.getLevelStudy(),
+                    a.getUniversity(),
+                    a.getUser() != null ? a.getUser().getEnabled() : null,
+                    a.getSimulations() != null ? a.getSimulations().size() : 0
+            ));
+        }
+        return result;
     }
 
     private ApplicantResponseDTO toResponse(Applicant a) {

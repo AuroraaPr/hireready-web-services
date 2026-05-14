@@ -1,5 +1,6 @@
 package com.hireready.controllers;
 
+import com.hireready.dtos.QuestionBankAdminSummaryResponseDTO;
 import com.hireready.dtos.QuestionBankResponseDTO;
 import com.hireready.dtos.CreateQuestionBankRequestDTO;
 import com.hireready.dtos.QuestionBankSummaryResponseDTO;
@@ -38,5 +39,23 @@ public class QuestionBankController {
             @RequestParam(value = "filter", defaultValue = "all") String filter) {
         return new ResponseEntity<>(
                 questionBankService.listAvailableForApplicant(applicantUserId, filter), HttpStatus.OK);
+    }
+
+    // US20  GET http://localhost:8080/hireready/admin/{userId}/question-banks
+    //        GET http://localhost:8080/hireready/admin/{userId}/question-banks?companyId=3
+    @GetMapping("/admin/{userId}/question-banks")
+    public ResponseEntity<List<QuestionBankAdminSummaryResponseDTO>> listForAdmin(
+            @PathVariable("userId") Long adminUserId,
+            @RequestParam(value = "companyId", required = false) Long companyId) {
+        return new ResponseEntity<>(
+                questionBankService.listForAdmin(adminUserId, companyId), HttpStatus.OK);
+    }
+
+    // US21  GET http://localhost:8080/hireready/admin/{userId}/question-banks/{bankId}
+    @GetMapping("/admin/{userId}/question-banks/{bankId}")
+    public ResponseEntity<QuestionBankResponseDTO> findDetailForAdmin(
+            @PathVariable("userId") Long adminUserId,
+            @PathVariable("bankId") Long bankId) {
+        return new ResponseEntity<>(questionBankService.findDetailForAdmin(adminUserId, bankId), HttpStatus.OK);
     }
 }

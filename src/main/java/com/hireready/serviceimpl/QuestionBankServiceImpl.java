@@ -1,9 +1,6 @@
 package com.hireready.serviceimpl;
 
-import com.hireready.dtos.CreateQuestionBankRequestDTO;
-import com.hireready.dtos.QuestionBankResponseDTO;
-import com.hireready.dtos.QuestionBankSummaryResponseDTO;
-import com.hireready.dtos.QuestionResponseDTO;
+import com.hireready.dtos.*;
 import com.hireready.entities.*;
 import com.hireready.enums.AuthorityRole;
 import com.hireready.enums.SimulationStatus;
@@ -131,6 +128,11 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 
         List<QuestionBankSummaryResponseDTO> result = new ArrayList<>();
         for (QuestionBank bank : banks) {
+            if (bank.getCompany() != null
+                    && bank.getCompany().getUser() != null
+                    && Boolean.FALSE.equals(bank.getCompany().getUser().getEnabled())) {
+                continue;
+            }
             result.add(toSummary(bank, applicant));
         }
         return result;
@@ -188,5 +190,52 @@ public class QuestionBankServiceImpl implements QuestionBankService {
                 b.getDescription(), b.getJobPosition(), b.getLevel(),
                 careerNames, numQuestions, status
         );
+    }
+
+    // US20
+    @Override
+    public List<QuestionBankAdminSummaryResponseDTO> listForAdmin(Long adminUserId, Long companyId) {
+        userService.validateRole(adminUserId, AuthorityRole.ADMIN);
+
+        List<QuestionBank> banks;
+        if (companyId != null) {
+            banks = questionBankRepository.findByCompany_Id(companyId);
+        } else {
+            banks = questionBankRepository.findAll();
+        }
+
+        List<QuestionBankAdminSummaryResponseDTO> result = new ArrayList<>();
+        for (QuestionBank b : banks) {
+            List<String> careerNames = new ArrayList<>();
+            if (b.getQuestionBankCareers() != null) {
+                for (QuestionBankCareer qbc : b.getQuestionBankCareers()) {
+                    careerNames.add(qbc.getCareer().getName());
+                }
+            }
+            Boolean companyEnabled = b.getCompany() != null && b.getCompany().getUser() != null
+                    ? b.getCompany().getUser().getEnabled() : null;
+            result.add(new QuestionBankAdminSummaryResponseDTO(
+                    b.getId(),
+                    b.getName(),
+                    b.getCompany() != null ? b.getCompany().getId() : null,
+                    b.getCompany() != null ? b.getCompany().getName() : null,
+                    companyEnabled,
+                    b.getJobPosition(),
+                    b.getLevel(),
+                    careerNames,
+                    b.getQuestions() != null ? b.getQuestions().size() : 0,
+                    b.getSimulations() != null ? b.getSimulations().size() : 0
+            ));
+        }
+        return result;
+    }
+
+    // US21
+    @Override
+    public QuestionBankResponseDTO findDetailForAdmin(Long adminUserId, Long bankId) {
+        userService.validateRole(adminUserId, AuthorityRole.ADMIN);
+        QuestionBank bank = findById(bankId);
+        bank.setQuestions(questionService.listByBankOrdered(bank.getId()));
+        return toFullResponse(bank);
     }
 }
