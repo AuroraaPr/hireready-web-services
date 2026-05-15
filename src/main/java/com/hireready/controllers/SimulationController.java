@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/hireready")
-@CrossOrigin("*")
+@CrossOrigin(origins = "${app.frontend.url}")
 public class SimulationController {
     @Autowired
     SimulationService simulationService;

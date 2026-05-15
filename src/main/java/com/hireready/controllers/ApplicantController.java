@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "${app.frontend.url}")
 @RequestMapping("/hireready")
 public class ApplicantController {
     @Autowired

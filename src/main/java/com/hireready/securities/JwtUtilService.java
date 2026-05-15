@@ -3,6 +3,7 @@ package com.hireready.securities;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -14,13 +15,13 @@ import java.util.function.Function;
 
 @Service
 public class JwtUtilService {
-    private static final String JWT_SIGNATURE_KEY =
-            "SElSRV9SRUFEWV9BUlFVSV9XRUJfVVBDX0lOR0VOSUVSSUFfU0lTVEVNQVNfREVfSU5GT1JNQUNJT04K";
+    @Value("${jwt.secret}")
+    private String jwtSignatureKey;
 
-    private static final Long JWT_TOKEN_VALIDITY = 1000 * 60 * 60 * (long) 3; // 3 horas
+    private static final Long JWT_TOKEN_VALIDITY = 1000L * 60 * 60 * 3;
 
     private SecretKey getSigningKey() {
-        byte[] decodedKey = Base64.getDecoder().decode(JWT_SIGNATURE_KEY);
+        byte[] decodedKey = Base64.getDecoder().decode(jwtSignatureKey);
         return Keys.hmacShaKeyFor(decodedKey);
     }
 
@@ -56,7 +57,7 @@ public class JwtUtilService {
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))  // ⭐ esta línea es la corregida
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }

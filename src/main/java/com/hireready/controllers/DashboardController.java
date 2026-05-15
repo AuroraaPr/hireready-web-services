@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "${app.frontend.url}")
 @RequestMapping("/hireready")
 public class DashboardController {
     @Autowired

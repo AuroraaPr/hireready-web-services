@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class HireReadyApplication {
         SpringApplication.run(HireReadyApplication.class, args);
     }
     @Bean
+    @Profile("dev")
     public CommandLineRunner seed(
             AuthorityRepository authorityRepository,
             CareerRepository careerRepository,

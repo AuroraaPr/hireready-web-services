@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "${app.frontend.url}")
 @RequestMapping("/hireready-banks")
 public class QuestionBankController {
 
     @Autowired
     QuestionBankService questionBankService;
 
-    // US-06  POST http://localhost:8080/hireready/companies/{userId}/question-banks
+    // US06  POST http://localhost:8080/hireready/companies/{userId}/question-banks
     @PostMapping("/companies/{userId}/question-banks")
     public ResponseEntity<QuestionBankResponseDTO> create(
             @PathVariable("userId") Long companyUserId,
