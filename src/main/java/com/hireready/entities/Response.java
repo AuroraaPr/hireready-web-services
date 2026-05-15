@@ -16,6 +16,7 @@ public class Response {
     private Long id;
 
     private String audioUrl;
+    @Column(columnDefinition = "TEXT")
     private String transcription;
     private Integer duration;
 

@@ -53,6 +53,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
     @Override
     public QuestionBankResponseDTO create(Long companyUserId, CreateQuestionBankRequestDTO request) {
         userService.validateRole(companyUserId, AuthorityRole.COMPANY); // US04
+        userService.validateOwnership(companyUserId);
         Company company = companyService.findByUserId(companyUserId);
 
         if (request.getName() == null || request.getName().isBlank()) {
@@ -111,7 +112,8 @@ public class QuestionBankServiceImpl implements QuestionBankService {
     // US07 y US08
     @Override
     public List<QuestionBankSummaryResponseDTO> listAvailableForApplicant(Long applicantUserId, String filter) {
-        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT); // US04
+        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT);
+        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         List<QuestionBank> banks;
@@ -196,7 +198,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
     @Override
     public List<QuestionBankAdminSummaryResponseDTO> listForAdmin(Long adminUserId, Long companyId) {
         userService.validateRole(adminUserId, AuthorityRole.ADMIN);
-
+        userService.validateOwnership(adminUserId);
         List<QuestionBank> banks;
         if (companyId != null) {
             banks = questionBankRepository.findByCompany_Id(companyId);
@@ -234,6 +236,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
     @Override
     public QuestionBankResponseDTO findDetailForAdmin(Long adminUserId, Long bankId) {
         userService.validateRole(adminUserId, AuthorityRole.ADMIN);
+        userService.validateOwnership(adminUserId);
         QuestionBank bank = findById(bankId);
         bank.setQuestions(questionService.listByBankOrdered(bank.getId()));
         return toFullResponse(bank);

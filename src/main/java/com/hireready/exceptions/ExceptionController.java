@@ -1,12 +1,14 @@
 package com.hireready.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-
-import jakarta.validation.ValidationException;
 
 import java.time.LocalDateTime;
 
@@ -14,46 +16,56 @@ import java.time.LocalDateTime;
 
 public class ExceptionController {
     @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ExceptionMessage validationException(ValidationException e, WebRequest r){
-        return new ExceptionMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                e.getClass().getSimpleName(),
-                e.getMessage(),
-                r.getDescription(false),
-                LocalDateTime.now()
-        );
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionMessage validationException(ValidationException e, WebRequest r) {
+        return build(HttpStatus.BAD_REQUEST.value(), e, r);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ExceptionMessage emptyResultDataAccessException(ResourceNotFoundException e, WebRequest r){
-        return new ExceptionMessage(
-                HttpStatus.NOT_FOUND.value(),
-                e.getClass().getSimpleName(),
-                e.getMessage(),
-                r.getDescription(false),
-                LocalDateTime.now()
-        );
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionMessage resourceNotFound(ResourceNotFoundException e, WebRequest r) {
+        return build(HttpStatus.NOT_FOUND.value(), e, r);
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
-    @ResponseStatus(value = HttpStatus.CONFLICT)
-    public ExceptionMessage duplicateResourceException(DuplicateResourceException e, WebRequest r){
-        return new ExceptionMessage(
-                HttpStatus.CONFLICT.value(),
-                e.getClass().getSimpleName(),
-                e.getMessage(),
-                r.getDescription(false),
-                LocalDateTime.now()
-        );
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionMessage duplicateResource(DuplicateResourceException e, WebRequest r) {
+        return build(HttpStatus.CONFLICT.value(), e, r);
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    public ExceptionMessage forbiddenException(ForbiddenException e, WebRequest r){
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionMessage forbidden(ForbiddenException e, WebRequest r) {
+        return build(HttpStatus.FORBIDDEN.value(), e, r);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionMessage badCredentials(BadCredentialsException e, WebRequest r) {
+        return build(HttpStatus.UNAUTHORIZED.value(), e, r);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionMessage disabled(DisabledException e, WebRequest r) {
+        return build(HttpStatus.FORBIDDEN.value(), e, r); // US-19: user.enabled=false
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionMessage accessDenied(AccessDeniedException e, WebRequest r) {
+        return build(HttpStatus.FORBIDDEN.value(), e, r); // ruta exige rol que no tienes
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionMessage authentication(AuthenticationException e, WebRequest r) {
+        return build(HttpStatus.UNAUTHORIZED.value(), e, r);
+    }
+
+    private ExceptionMessage build(int status, Exception e, WebRequest r) {
         return new ExceptionMessage(
-                HttpStatus.FORBIDDEN.value(),
+                status,
                 e.getClass().getSimpleName(),
                 e.getMessage(),
                 r.getDescription(false),

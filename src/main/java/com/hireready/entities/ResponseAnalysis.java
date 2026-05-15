@@ -18,6 +18,7 @@ public class ResponseAnalysis {
     private Integer relevanceScore;
     private Integer clarityScore;
     private Integer structureScore;
+    @Column(columnDefinition = "TEXT")
     private String feedback;
 
     @OneToOne

@@ -48,6 +48,7 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public SimulationResponseDTO start(Long applicantUserId, SimulationStartRequestDTO request) {
         userService.validateRole(applicantUserId, AuthorityRole.APPLICANT); // US04
+        userService.validateOwnership(applicantUserId);
 
         if (request.getQuestionBankId() == null) {
             throw new ValidationException("questionBankId is required");
@@ -94,6 +95,7 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public ContinueSimulationResponseDTO continueLatest(Long applicantUserId) {
         userService.validateRole(applicantUserId, AuthorityRole.APPLICANT); // US04
+        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         Simulation sim = simulationRepository
@@ -297,6 +299,7 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public List<SimulationHistoryItemResponseDTO> listHistory(Long applicantUserId) {
         userService.validateRole(applicantUserId, AuthorityRole.APPLICANT);
+        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         List<Simulation> sims = simulationRepository
@@ -334,6 +337,7 @@ public class SimulationServiceImpl implements SimulationService {
     @Override
     public Simulation findOwnedSimulation(Long applicantUserId, Long simulationId) {
         userService.validateRole(applicantUserId, AuthorityRole.APPLICANT);
+        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         Simulation sim = simulationRepository.findById(simulationId).orElse(null);

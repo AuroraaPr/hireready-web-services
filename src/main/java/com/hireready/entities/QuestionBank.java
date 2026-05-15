@@ -17,6 +17,7 @@ public class QuestionBank {
     private Long id;
 
     private String name;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String jobPosition;
     private String level;

@@ -89,6 +89,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyResponseDTO getProfile(Long userId) {
         userService.validateRole(userId, AuthorityRole.COMPANY);
+        userService.validateOwnership(userId);
         return toResponse(findByUserId(userId));
     }
 
@@ -96,6 +97,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyResponseDTO updateProfile(Long userId, CompanyUpdateDTO companyUpdateDTO) {
         userService.validateRole(userId, AuthorityRole.COMPANY);
+        userService.validateOwnership(userId);
         Company company = findByUserId(userId);
 
         if (companyUpdateDTO.getName() != null && !companyUpdateDTO.getName().isBlank()) {
@@ -112,6 +114,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public List<CompanySummaryResponseDTO> listAll(Long adminUserId) {
         userService.validateRole(adminUserId, AuthorityRole.ADMIN);
+        userService.validateOwnership(adminUserId);
         List<CompanySummaryResponseDTO> result = new ArrayList<>();
         for (Company c : companyRepository.findAll()) {
             result.add(new CompanySummaryResponseDTO(

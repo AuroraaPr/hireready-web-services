@@ -1,7 +1,5 @@
 package com.hireready.serviceimpl;
 
-import com.hireready.dtos.LoginRequestDTO;
-import com.hireready.dtos.LoginResponseDTO;
 import com.hireready.dtos.UserStatusResponseDTO;
 import com.hireready.entities.User;
 import com.hireready.enums.AuthorityRole;
@@ -10,8 +8,14 @@ import com.hireready.exceptions.ForbiddenException;
 import com.hireready.exceptions.ResourceNotFoundException;
 import com.hireready.exceptions.ValidationException;
 import com.hireready.repositories.UserRepository;
+import com.hireready.securities.UserSecurity;
 import com.hireready.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,6 +49,7 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateResourceException("Email " + user.getEmail() + " is already registered");
         }
         if (user.getEnabled() == null) user.setEnabled(true);
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -59,23 +64,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
-    // US03
-    @Override
-    public User login(String email, String password) {
-        if (email == null || email.isBlank() || password == null || password.isBlank()) {
-            throw new ValidationException("Email and password are required");
-        }
-        User user = userRepository.findByEmail(email);
-        if (user == null || !user.getPassword().equals(password)) {
-            throw new ValidationException("Invalid credentials");
-        }
-        if (Boolean.FALSE.equals(user.getEnabled())) {
-            throw new ForbiddenException("User account is disabled");
-        }
-        return user;
-    }
-
-    // US04
+     // US04
     @Override
     public void validateRole(Long userId, AuthorityRole expectedRole) {
         User user = findById(userId);
@@ -85,25 +74,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // US03
-    @Override
-    public LoginResponseDTO loginAsDto(LoginRequestDTO loginRequestDTO) {
-        User user = login(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-        Long applicantId = user.getApplicant() != null ? user.getApplicant().getId() : null;
-        Long companyId   = user.getCompany()   != null ? user.getCompany().getId()   : null;
-        return new LoginResponseDTO(
-                user.getId(),
-                user.getEmail(),
-                user.getAuthority().getRole(),
-                applicantId,
-                companyId
-        );
-    }
-
     // US19
     @Override
     public UserStatusResponseDTO setEnabled(Long adminUserId, Long targetUserId, boolean enabled) {
         validateRole(adminUserId, AuthorityRole.ADMIN);
+        validateOwnership(adminUserId);
         if (adminUserId.equals(targetUserId)) {
             throw new ValidationException("Admin cannot change their own active status");
         }
@@ -118,5 +93,25 @@ public class UserServiceImpl implements UserService {
                 target.getAuthority() != null ? target.getAuthority().getRole() : null,
                 target.getEnabled()
         );
+    }
+
+    ///////////////////////////////////////////////
+
+
+    @Override
+    public Long getAuthenticatedUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof UserSecurity)) {
+            throw new ForbiddenException("Not authenticated");
+        }
+        return ((UserSecurity) auth.getPrincipal()).getUser().getId();
+    }
+
+    @Override
+    public void validateOwnership(Long pathUserId) {
+        Long authId = getAuthenticatedUserId();
+        if (!authId.equals(pathUserId)) {
+            throw new ForbiddenException("You can only access your own resources");
+        }
     }
 }
