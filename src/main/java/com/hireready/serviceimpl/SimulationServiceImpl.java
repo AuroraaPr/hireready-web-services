@@ -171,11 +171,7 @@ public class SimulationServiceImpl implements SimulationService {
                 sim, questionId, duration, transcription, bytes, audio.getContentType());
 
         // analizar
-        try {
-            responseAnalysisService.analyzeAndSave(saved);
-        } catch (Exception e) {
-            System.err.println("Analysis error: " + e.getMessage());
-        }
+        responseAnalysisService.analyzeAsync(saved);
 
         // progreso y siguiente pregunta
         List<Question> ordered = questionService.listByBankOrdered(sim.getQuestionBank().getId());
@@ -246,8 +242,11 @@ public class SimulationServiceImpl implements SimulationService {
 
         for (Response r : answered) {
             if (r.getResponseAnalysis() == null) {
-                ResponseAnalysis a = responseAnalysisService.analyzeAndSave(r);
-                r.setResponseAnalysis(a);
+                try {
+                    r.setResponseAnalysis(responseAnalysisService.analyzeAndSave(r));
+                } catch (Exception e) {
+                    r.setResponseAnalysis(responseAnalysisService.findByResponseId(r.getId()));
+                }
             }
         }
 
@@ -354,8 +353,7 @@ public class SimulationServiceImpl implements SimulationService {
         );
     }
 
-    @Override
-    public Simulation findOwnedSimulation(Long applicantUserId, Long simulationId) {
+    private Simulation findOwnedSimulation(Long applicantUserId, Long simulationId) {
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         Simulation sim = simulationRepository.findById(simulationId).orElse(null);

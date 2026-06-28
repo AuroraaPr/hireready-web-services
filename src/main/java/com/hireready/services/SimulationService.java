@@ -16,6 +16,5 @@ public interface SimulationService {
     public FinalizeSimulationResponseDTO finalize(Long applicantUserId, Long simulationId);
     public SimulationReportFullResponseDTO getReport(Long applicantUserId, Long simulationId);
     public List<SimulationHistoryItemResponseDTO> listHistory(Long applicantUserId);
-    public Simulation findOwnedSimulation(Long applicantUserId, Long simulationId);
     public ResponseAudio getResponseAudio(Long applicantUserId, Long simulationId, Long responseId);
 }

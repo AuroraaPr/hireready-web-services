@@ -10,6 +10,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.JsonNode;
@@ -50,6 +51,9 @@ public class ResponseAnalysisServiceImpl implements ResponseAnalysisService {
     // US13
     @Override
     public ResponseAnalysis analyzeAndSave(Response response) {
+        ResponseAnalysis existing = responseAnalysisRepository.findByResponse_Id(response.getId());
+        if (existing != null) return existing;
+
         String transcription = response.getTranscription() == null ? "" : response.getTranscription();
         String question = response.getQuestion() != null ? response.getQuestion().getContent() : "";
 
@@ -73,6 +77,21 @@ public class ResponseAnalysisServiceImpl implements ResponseAnalysisService {
         ResponseAnalysis analysis = new ResponseAnalysis(
                 null, relevance, clarity, structure, feedback, response);
         return responseAnalysisRepository.save(analysis);
+    }
+
+    @Async
+    @Override
+    public void analyzeAsync(Response response) {
+        try {
+            analyzeAndSave(response);
+        } catch (Exception e) {
+            System.err.println("Async analysis error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseAnalysis findByResponseId(Long responseId) {
+        return responseAnalysisRepository.findByResponse_Id(responseId);
     }
 
     // contexto de la entrevista
