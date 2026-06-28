@@ -15,7 +15,6 @@ public class Response {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String audioUrl;
     @Column(columnDefinition = "TEXT")
     private String transcription;
     private Integer duration;

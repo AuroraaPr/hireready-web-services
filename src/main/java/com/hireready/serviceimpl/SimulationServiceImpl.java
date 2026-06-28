@@ -11,7 +11,9 @@ import com.hireready.repositories.SimulationRepository;
 import com.hireready.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -22,9 +24,6 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Autowired
     ResponseService responseService;
-
-    @Autowired
-    UserService userService;
 
     @Autowired
     ApplicantService applicantService;
@@ -44,11 +43,15 @@ public class SimulationServiceImpl implements SimulationService {
     @Autowired
     SimulationReportService simulationReportService;
 
+    @Autowired
+    TranscriptionService transcriptionService;
+
+    @Autowired
+    ResponseAudioService responseAudioService;
+
     // US09
     @Override
     public SimulationResponseDTO start(Long applicantUserId, SimulationStartRequestDTO request) {
-        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT); // US04
-        userService.validateOwnership(applicantUserId);
 
         if (request.getQuestionBankId() == null) {
             throw new ValidationException("questionBankId is required");
@@ -94,8 +97,6 @@ public class SimulationServiceImpl implements SimulationService {
     // US10
     @Override
     public ContinueSimulationResponseDTO continueLatest(Long applicantUserId) {
-        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT); // US04
-        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         Simulation sim = simulationRepository
@@ -121,10 +122,6 @@ public class SimulationServiceImpl implements SimulationService {
             }
         }
         if (pending == null) {
-            // si estan todas respondidas -> COMPLETED
-            sim.setStatus(SimulationStatus.COMPLETED);
-            sim.setCompletedAt(LocalDateTime.now());
-            simulationRepository.save(sim);
             return new ContinueSimulationResponseDTO(
                     sim.getId(),
                     sim.getStatus(),
@@ -151,9 +148,34 @@ public class SimulationServiceImpl implements SimulationService {
 
     //US11
     @Override
-    public SubmitResponseResponseDTO submitResponse(Long applicantUserId, Long simulationId, SubmitResponseRequestDTO request) {
-        Simulation sim = findOwnedSimulation(applicantUserId, simulationId); // valida rol + ownership
-        Response saved = responseService.submit(sim, request);
+    public SubmitResponseResponseDTO submitResponse(Long applicantUserId, Long simulationId,
+                                                    Long questionId, Integer duration, MultipartFile audio){
+        Simulation sim = findOwnedSimulation(applicantUserId, simulationId);
+
+        if (audio == null || audio.isEmpty()) {
+            throw new ValidationException("Audio is required to advance");
+        }
+
+        byte[] bytes;
+        try {
+            bytes = audio.getBytes();
+        } catch (IOException e) {
+            throw new ValidationException("Could not read audio: " + e.getMessage());
+        }
+
+        // transcribir
+        String transcription = transcriptionService.transcribe(bytes, audio.getOriginalFilename());
+
+        // guardar
+        Response saved = responseService.submit(
+                sim, questionId, duration, transcription, bytes, audio.getContentType());
+
+        // analizar
+        try {
+            responseAnalysisService.analyzeAndSave(saved);
+        } catch (Exception e) {
+            System.err.println("Analysis error: " + e.getMessage());
+        }
 
         // progreso y siguiente pregunta
         List<Question> ordered = questionService.listByBankOrdered(sim.getQuestionBank().getId());
@@ -261,7 +283,7 @@ public class SimulationServiceImpl implements SimulationService {
                     r.getId(),
                     r.getQuestion() != null ? r.getQuestion().getOrderIndex() : null,
                     r.getQuestion() != null ? r.getQuestion().getContent() : null,
-                    r.getAudioUrl(),
+                    "/hireready/applicants/me/simulations/" + sim.getId() + "/responses/" + r.getId() + "/audio",
                     r.getTranscription(),
                     r.getDuration(),
                     a != null ? a.getRelevanceScore() : null,
@@ -298,8 +320,6 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Override
     public List<SimulationHistoryItemResponseDTO> listHistory(Long applicantUserId) {
-        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT);
-        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         List<Simulation> sims = simulationRepository
@@ -336,8 +356,6 @@ public class SimulationServiceImpl implements SimulationService {
 
     @Override
     public Simulation findOwnedSimulation(Long applicantUserId, Long simulationId) {
-        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT);
-        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantService.findByUserId(applicantUserId);
 
         Simulation sim = simulationRepository.findById(simulationId).orElse(null);
@@ -349,5 +367,18 @@ public class SimulationServiceImpl implements SimulationService {
                     "Simulation id: " + simulationId + " does not belong to applicant");
         }
         return sim;
+    }
+
+    //US14
+    @Override
+    public ResponseAudio getResponseAudio(Long applicantUserId, Long simulationId, Long responseId) {
+        Simulation sim = findOwnedSimulation(applicantUserId, simulationId);
+
+        if (!responseService.existsInSimulation(responseId, sim.getId())) {
+            throw new ResourceNotFoundException(
+                    "Response id: " + responseId + " not found in simulation " + simulationId);
+        }
+
+        return responseAudioService.findByResponseId(responseId);
     }
 }

@@ -43,8 +43,6 @@ public class DashboardServiceImpl implements DashboardService {
     // US22
     @Override
     public ApplicantDashboardResponseDTO getApplicantMetrics(Long applicantUserId) {
-        userService.validateRole(applicantUserId, AuthorityRole.APPLICANT); // US-04
-        userService.validateOwnership(applicantUserId);
         Applicant applicant = applicantRepository.findByUserId(applicantUserId);
         Long applicantId = applicant.getId();
 
@@ -104,8 +102,6 @@ public class DashboardServiceImpl implements DashboardService {
     // US23
     @Override
     public CompanyDashboardResponseDTO getCompanyMetrics(Long companyUserId) {
-        userService.validateRole(companyUserId, AuthorityRole.COMPANY); // US-04
-        userService.validateOwnership(companyUserId);
         Company company = companyRepository.findByUserId(companyUserId);
         Long companyId = company.getId();
 
@@ -244,8 +240,6 @@ public class DashboardServiceImpl implements DashboardService {
     // US24
     @Override
     public DashboardResponseDTO getMetrics(Long adminUserId) {
-        userService.validateRole(adminUserId, AuthorityRole.ADMIN);
-        userService.validateOwnership(adminUserId);
 
         long totalUsers = userRepository.count();
         long totalApplicants = applicantRepository.count();

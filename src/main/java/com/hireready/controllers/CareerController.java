@@ -3,6 +3,7 @@ package com.hireready.controllers;
 import com.hireready.dtos.CareerRequestDTO;
 import com.hireready.dtos.CareerResponseDTO;
 import com.hireready.services.CareerService;
+import com.hireready.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,27 +17,29 @@ import java.util.List;
 public class CareerController {
     @Autowired
     CareerService careerService;
+    @Autowired
+    private UserService userService;
 
-    // US16  GET http://localhost:8080/hireready/admin/{userId}/careers
-    @GetMapping("/admin/{userId}/careers")
-    public ResponseEntity<List<CareerResponseDTO>> listAll(@PathVariable("userId") Long adminUserId) {
+    // US16  GET http://localhost:8080/hireready/admin/careers
+    @GetMapping("/admin/careers")
+    public ResponseEntity<List<CareerResponseDTO>> listAll() {
+        Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(careerService.listAll(adminUserId), HttpStatus.OK);
     }
 
-    // US16  POST http://localhost:8080/hireready/admin/{userId}/careers
-    @PostMapping("/admin/{userId}/careers")
-    public ResponseEntity<CareerResponseDTO> create(
-            @PathVariable("userId") Long adminUserId,
-            @RequestBody CareerRequestDTO request) {
+    // US16  POST http://localhost:8080/hireready/admin/careers
+    @PostMapping("/admin/careers")
+    public ResponseEntity<CareerResponseDTO> create(@RequestBody CareerRequestDTO request) {
+        Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(careerService.create(adminUserId, request), HttpStatus.CREATED);
     }
 
-    // US16  PUT http://localhost:8080/hireready/admin/{userId}/careers/{careerId}
-    @PutMapping("/admin/{userId}/careers/{careerId}")
+    // US16  PUT http://localhost:8080/hireready/admin/careers/{careerId}
+    @PutMapping("/admin/careers/{careerId}")
     public ResponseEntity<CareerResponseDTO> update(
-            @PathVariable("userId") Long adminUserId,
             @PathVariable("careerId") Long careerId,
             @RequestBody CareerRequestDTO request) {
+        Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
                 careerService.update(adminUserId, careerId, request), HttpStatus.OK);
     }

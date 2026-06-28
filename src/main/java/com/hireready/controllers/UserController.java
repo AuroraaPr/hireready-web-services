@@ -48,19 +48,19 @@ public class UserController {
     }
 
     // US19  POST http://localhost:8080/hireready/admin/{userId}/users/{targetUserId}/deactivate
-    @PostMapping("/admin/{userId}/users/{targetUserId}/deactivate")
+    @PostMapping("/admin/users/{targetUserId}/deactivate")
     public ResponseEntity<UserStatusResponseDTO> deactivate(
-            @PathVariable("userId") Long adminUserId,
             @PathVariable("targetUserId") Long targetUserId) {
+        Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
                 userService.setEnabled(adminUserId, targetUserId, false), HttpStatus.OK);
     }
 
     // US19  POST http://localhost:8080/hireready/admin/{userId}/users/{targetUserId}/activate
-    @PostMapping("/admin/{userId}/users/{targetUserId}/activate")
+    @PostMapping("/admin/users/{targetUserId}/activate")
     public ResponseEntity<UserStatusResponseDTO> activate(
-            @PathVariable("userId") Long adminUserId,
             @PathVariable("targetUserId") Long targetUserId) {
+        Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
                 userService.setEnabled(adminUserId, targetUserId, true), HttpStatus.OK);
     }

@@ -123,8 +123,6 @@ public class ApplicantServiceImpl implements ApplicantService {
     // US05
     @Override
     public ApplicantResponseDTO getProfile(Long userId) {
-        userService.validateRole(userId, AuthorityRole.APPLICANT);
-        userService.validateOwnership(userId);
         return toResponse(findByUserId(userId));
     }
 
@@ -132,8 +130,6 @@ public class ApplicantServiceImpl implements ApplicantService {
     @Transactional
     @Override
     public ApplicantResponseDTO updateProfile(Long userId, ApplicantUpdateDTO applicantUpdateDTO) {
-        userService.validateRole(userId, AuthorityRole.APPLICANT);
-        userService.validateOwnership(userId);
 
         Applicant applicant = findByUserId(userId);
 
@@ -165,8 +161,6 @@ public class ApplicantServiceImpl implements ApplicantService {
 
     @Override
     public List<ApplicantSummaryResponseDTO> listAll(Long adminUserId) {
-        userService.validateRole(adminUserId, AuthorityRole.ADMIN); // US-04
-        userService.validateOwnership(adminUserId);
         List<ApplicantSummaryResponseDTO> result = new ArrayList<>();
         for (Applicant a : applicantRepository.findAll()) {
             result.add(new ApplicantSummaryResponseDTO(

@@ -57,26 +57,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
-    @Override
-    public Boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-     // US04
-    @Override
-    public void validateRole(Long userId, AuthorityRole expectedRole) {
-        User user = findById(userId);
-        if (user.getAuthority() == null || user.getAuthority().getRole() != expectedRole) {
-            throw new ForbiddenException(
-                    "User id: " + userId + " does not have role " + expectedRole);
-        }
-    }
-
     // US19
     @Override
     public UserStatusResponseDTO setEnabled(Long adminUserId, Long targetUserId, boolean enabled) {
-        validateRole(adminUserId, AuthorityRole.ADMIN);
-        validateOwnership(adminUserId);
         if (adminUserId.equals(targetUserId)) {
             throw new ValidationException("Admin cannot change their own active status");
         }
@@ -103,13 +86,5 @@ public class UserServiceImpl implements UserService {
             throw new ForbiddenException("Not authenticated");
         }
         return ((UserSecurity) auth.getPrincipal()).getUser().getId();
-    }
-
-    @Override
-    public void validateOwnership(Long pathUserId) {
-        Long authId = getAuthenticatedUserId();
-        if (!authId.equals(pathUserId)) {
-            throw new ForbiddenException("You can only access your own resources");
-        }
     }
 }

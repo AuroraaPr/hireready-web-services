@@ -40,6 +40,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable);
 
         // reglas de autorización
+        // US04
         http.authorizeHttpRequests(auth -> auth
                 //WHITELIST
                 .requestMatchers(HttpMethod.POST, "/hireready/login").permitAll()

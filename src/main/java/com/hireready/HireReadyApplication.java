@@ -178,8 +178,7 @@ public class HireReadyApplication {
                 int[][] s1Scores = {{82, 70, 78}, {88, 85, 80}, {75, 65, 70}, {72, 60, 68}};
                 for (int i = 0; i < b1Questions.size(); i++) {
                     Response r = responseRepository.save(new Response(
-                            null, "https://storage.hireready.pe/audio/s1_q" + (i+1) + ".webm",
-                            s1Transcriptions[i], 75 + i * 5, s1, b1Questions.get(i), null));
+                            null, s1Transcriptions[i], 75 + i * 5, s1, b1Questions.get(i), null));
                     responseAnalysisRepository.save(new ResponseAnalysis(
                             null, s1Scores[i][0], s1Scores[i][1], s1Scores[i][2],
                             "Respuesta bien estructurada con buen uso de ejemplos concretos.", r));
@@ -206,8 +205,7 @@ public class HireReadyApplication {
                 int[][] s2Scores = {{85, 78, 82}, {90, 88, 85}, {72, 60, 70}, {88, 82, 80}};
                 for (int i = 0; i < b4Questions.size(); i++) {
                     Response r = responseRepository.save(new Response(
-                            null, "https://storage.hireready.pe/audio/s2_q" + (i+1) + ".webm",
-                            s2Transcriptions[i], 80 + i * 3, s2, b4Questions.get(i), null));
+                            null, s2Transcriptions[i], 80 + i * 3, s2, b4Questions.get(i), null));
                     responseAnalysisRepository.save(new ResponseAnalysis(
                             null, s2Scores[i][0], s2Scores[i][1], s2Scores[i][2],
                             "Buen dominio del tema con ejemplos relevantes.", r));
@@ -230,12 +228,10 @@ public class HireReadyApplication {
                         maria, b2, null, null, null));
                 List<Question> b2Questions = questionRepository.findByQuestionBank_IdOrderByOrderIndexAsc(b2.getId());
                 responseRepository.save(new Response(
-                        null, "https://storage.hireready.pe/audio/s4_q1.webm",
-                        "Diseñé una arquitectura de microservicios para una plataforma de e-commerce. Separamos los dominios en servicios de catálogo, carrito, órdenes y pagos. Usamos un API Gateway para enrutar peticiones y RabbitMQ para comunicación asíncrona entre servicios.",
+                        null, "Diseñé una arquitectura de microservicios para una plataforma de e-commerce. Separamos los dominios en servicios de catálogo, carrito, órdenes y pagos. Usamos un API Gateway para enrutar peticiones y RabbitMQ para comunicación asíncrona entre servicios.",
                         95, s4, b2Questions.get(0), null));
                 responseRepository.save(new Response(
-                        null, "https://storage.hireready.pe/audio/s4_q2.webm",
-                        "Para un cuello de botella primero hago profiling con herramientas como JProfiler o New Relic. Después identifico si es la base de datos, la CPU o la red. Generalmente la solución pasa por agregar índices, cachear con Redis, o escalar horizontalmente con réplicas.",
+                        null, "Para un cuello de botella primero hago profiling con herramientas como JProfiler o New Relic. Después identifico si es la base de datos, la CPU o la red. Generalmente la solución pasa por agregar índices, cachear con Redis, o escalar horizontalmente con réplicas.",
                         88, s4, b2Questions.get(1), null));
 
                 System.out.println("   Simulaciones: 2 COMPLETED de Juan, 1 ABANDONED de Juan, 1 IN_PROGRESS de María (Luis sin simulaciones)");
