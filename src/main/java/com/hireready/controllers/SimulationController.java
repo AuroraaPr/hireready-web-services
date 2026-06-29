@@ -33,7 +33,7 @@ public class SimulationController {
 
     // US10  GET http://localhost:8080/hireready/applicants/me/simulations/current
     @GetMapping("/applicants/me/simulations/current")
-    public ResponseEntity<ContinueSimulationResponseDTO> continueLatest() {
+    public ResponseEntity<ContinueSimulationResponseDTO> getCurrent() {
         Long applicantUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
                 simulationService.continueLatest(applicantUserId), HttpStatus.OK);
@@ -63,7 +63,7 @@ public class SimulationController {
 
     // US13  POST http://localhost:8080/hireready/applicants/me/simulations/{simulationId}/finalize
     @PostMapping("/applicants/me/simulations/{simulationId}/finalize")
-    public ResponseEntity<FinalizeSimulationResponseDTO> finalizeSimulation(
+    public ResponseEntity<FinalizeSimulationResponseDTO> finalize(
             @PathVariable("simulationId") Long simulationId) {
         Long applicantUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
@@ -93,7 +93,7 @@ public class SimulationController {
 
     // US15  GET http://localhost:8080/hireready/applicants/me/simulations/history
     @GetMapping("/applicants/me/simulations/history")
-    public ResponseEntity<List<SimulationHistoryItemResponseDTO>> listHistory() {
+    public ResponseEntity<List<SimulationHistoryItemResponseDTO>> getHistory() {
         Long applicantUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
                 simulationService.listHistory(applicantUserId), HttpStatus.OK);

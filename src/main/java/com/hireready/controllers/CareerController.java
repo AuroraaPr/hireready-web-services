@@ -26,13 +26,13 @@ public class CareerController {
 
     // US16  GET http://localhost:8080/hireready/admin/careers
     @GetMapping("/admin/careers")
-    public ResponseEntity<List<CareerResponseDTO>> listAll() {
+    public ResponseEntity<List<CareerResponseDTO>> list() {
         return new ResponseEntity<>(careerService.listAll(), HttpStatus.OK);
     }
 
     // US16  POST http://localhost:8080/hireready/admin/careers
     @PostMapping("/admin/careers")
-    public ResponseEntity<CareerResponseDTO> create(@RequestBody CareerRequestDTO request) {
+    public ResponseEntity<CareerResponseDTO> add(@RequestBody CareerRequestDTO request) {
         return new ResponseEntity<>(careerService.create(request), HttpStatus.CREATED);
     }
 

@@ -21,14 +21,14 @@ public class DashboardController {
 
     // US24  GET http://localhost:8080/hireready/admin/dashboard
     @GetMapping("/admin/dashboard")
-    public ResponseEntity<DashboardResponseDTO> getDashboard() {
+    public ResponseEntity<DashboardResponseDTO> forAdmin() {
         Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(dashboardService.getMetrics(adminUserId), HttpStatus.OK);
     }
 
     // US22  GET http://localhost:8080/hireready/applicants/me/dashboard
     @GetMapping("/applicants/me/dashboard")
-    public ResponseEntity<ApplicantDashboardResponseDTO> getApplicantDashboard() {
+    public ResponseEntity<ApplicantDashboardResponseDTO> forApplicant() {
         Long applicantUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
                 dashboardService.getApplicantMetrics(applicantUserId), HttpStatus.OK);
@@ -36,7 +36,7 @@ public class DashboardController {
 
     // US23  GET http://localhost:8080/hireready/companies/me/dashboard
     @GetMapping("/companies/me/dashboard")
-    public ResponseEntity<CompanyDashboardResponseDTO> getCompanyDashboard() {
+    public ResponseEntity<CompanyDashboardResponseDTO> forCompany() {
         Long companyUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
                 dashboardService.getCompanyMetrics(companyUserId), HttpStatus.OK);

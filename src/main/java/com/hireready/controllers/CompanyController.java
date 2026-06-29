@@ -33,14 +33,14 @@ public class CompanyController {
 
     // US05  GET http://localhost:8080/hireready/companies/me
     @GetMapping("/companies/me")
-    public ResponseEntity<CompanyResponseDTO> getProfile() {
+    public ResponseEntity<CompanyResponseDTO> getMe() {
         Long userId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(companyService.getProfile(userId), HttpStatus.OK);
     }
 
     // US05  PUT http://localhost:8080/hireready/companies/me
     @PutMapping("/companies/me")
-    public ResponseEntity<CompanyResponseDTO> updateProfile(@RequestBody CompanyUpdateDTO companyUpdateDTO) {
+    public ResponseEntity<CompanyResponseDTO> updateMe(@RequestBody CompanyUpdateDTO companyUpdateDTO) {
         Long userId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(companyService.updateProfile(userId, companyUpdateDTO), HttpStatus.OK);
     }

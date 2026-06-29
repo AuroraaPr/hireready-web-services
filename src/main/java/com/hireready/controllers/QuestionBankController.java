@@ -37,7 +37,7 @@ public class QuestionBankController {
     // GET http://localhost:8080/hireready/applicants/me/question-banks?filter=all
     // GET http://localhost:8080/hireready/applicants/me/question-banks?filter=recommended
     @GetMapping("/applicants/me/question-banks")
-    public ResponseEntity<List<QuestionBankSummaryResponseDTO>> listAvailable(
+    public ResponseEntity<List<QuestionBankSummaryResponseDTO>> listForApplicant(
             @RequestParam(value = "filter", defaultValue = "all") String filter) {
         Long applicantUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
@@ -56,7 +56,7 @@ public class QuestionBankController {
 
     // US21  GET http://localhost:8080/hireready/admin/question-banks/{bankId}
     @GetMapping("/admin/question-banks/{bankId}")
-    public ResponseEntity<QuestionBankResponseDTO> findDetailForAdmin(
+    public ResponseEntity<QuestionBankResponseDTO> getByIdForAdmin(
             @PathVariable("bankId") Long bankId) {
         Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(questionBankService.findDetailForAdmin(adminUserId, bankId), HttpStatus.OK);

@@ -34,14 +34,14 @@ public class ApplicantController {
 
     // US05  GET http://localhost:8080/hireready/applicants/me
     @GetMapping("/applicants/me")
-    public ResponseEntity<ApplicantResponseDTO> getProfile() {
+    public ResponseEntity<ApplicantResponseDTO> getMe() {
         Long userId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(applicantService.getProfile(userId), HttpStatus.OK);
     }
 
     // US05  PUT http://localhost:8080/hireready/applicants/me
     @PutMapping("/applicants/me")
-    public ResponseEntity<ApplicantResponseDTO> updateProfile(@RequestBody ApplicantUpdateDTO request) {
+    public ResponseEntity<ApplicantResponseDTO> updateMe(@RequestBody ApplicantUpdateDTO request) {
         Long userId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(applicantService.updateProfile(userId, request), HttpStatus.OK);
     }
