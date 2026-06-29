@@ -10,6 +10,7 @@ import com.hireready.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,30 +47,42 @@ public class DashboardServiceImpl implements DashboardService {
         Applicant applicant = applicantRepository.findByUserId(applicantUserId);
         Long applicantId = applicant.getId();
 
-        long total = simulationRepository.countByApplicant_Id(applicantId);
-        long completed = simulationRepository.countByApplicant_IdAndStatus(
-                applicantId, com.hireready.enums.SimulationStatus.COMPLETED);
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
+
+        long total = simulationRepository.countByApplicant_IdAndStartedAtAfter(applicantId, cutoff);
+        long completed = simulationRepository.countByApplicant_IdAndStatusAndCompletedAtAfter(
+                applicantId, com.hireready.enums.SimulationStatus.COMPLETED, cutoff);
 
         if (completed == 0) {
             return new ApplicantDashboardResponseDTO(
                     total, 0L, null, null, null, null, null,
                     new ArrayList<>(), new ArrayList<>(),
                     false,
-                    "Aún no tienes simulaciones completadas. Completa una para ver tus métricas."
+                    "Aún no tienes simulaciones completadas en los últimos 30 días. Completa una para ver tus métricas."
             );
         }
 
-        List<SimulationReport> reports = simulationReportRepository
-                .findBySimulation_Applicant_IdOrderBySimulation_CompletedAtAsc(applicantId);
+        // últimos 30 día para promedios y best
+        List<SimulationReport> reportsWindow = simulationReportRepository
+                .findBySimulation_Applicant_IdAndSimulation_CompletedAtAfter(applicantId, cutoff);
 
         int sumOverall = 0, sumRel = 0, sumCla = 0, sumStr = 0, best = 0;
-        List<ScoreTimePointDTO> overTime = new ArrayList<>();
-        for (SimulationReport r : reports) {
+        for (SimulationReport r : reportsWindow) {
             sumOverall += r.getOverallScore();
             sumRel += r.getAvgRelevance();
             sumCla += r.getAvgClarity();
             sumStr += r.getAvgStructure();
             if (r.getOverallScore() > best) best = r.getOverallScore();
+        }
+        int n = reportsWindow.size();
+
+        // últimas 10 simulaciones
+        List<SimulationReport> top10 = simulationReportRepository
+                .findTop10BySimulation_Applicant_IdOrderBySimulation_CompletedAtDesc(applicantId);
+        Collections.reverse(top10);
+
+        List<ScoreTimePointDTO> overTime = new ArrayList<>();
+        for (SimulationReport r : top10) {
             Simulation s = r.getSimulation();
             overTime.add(new ScoreTimePointDTO(
                     s.getCompletedAt(),
@@ -77,16 +90,16 @@ public class DashboardServiceImpl implements DashboardService {
                     s.getQuestionBank() != null ? s.getQuestionBank().getName() : null
             ));
         }
-        int n = reports.size();
 
-        // para el top muletillas
-        List<FillerWord> fillers = fillerWordRepository.findBySimulation_Applicant_Id(applicantId);
+        // últimos 30 días
+        List<FillerWord> fillers = fillerWordRepository
+                .findBySimulation_Applicant_IdAndSimulation_CompletedAtAfter(applicantId, cutoff);
         Map<String, Integer> agg = new HashMap<>();
         for (FillerWord fw : fillers) agg.merge(fw.getWord(), fw.getCount(), Integer::sum);
 
         List<FillerWordResponseDTO> topFillers = agg.entrySet().stream()
                 .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
-                .limit(5) // top 5
+                .limit(5)
                 .map(e -> new FillerWordResponseDTO(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
 
@@ -106,7 +119,8 @@ public class DashboardServiceImpl implements DashboardService {
         Long companyId = company.getId();
 
         List<QuestionBank> banks = questionBankRepository.findByCompany_Id(companyId);
-        List<Simulation> sims = simulationRepository.findByQuestionBank_Company_Id(companyId);
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
+        List<Simulation> sims = simulationRepository.findByQuestionBank_Company_IdAndStartedAtAfter(companyId, cutoff);
 
         long totalBanks = banks.size();
         long totalSims  = sims.size();
@@ -121,7 +135,7 @@ public class DashboardServiceImpl implements DashboardService {
                     new ArrayList<>(),
                     new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
                     false,
-                    "Aún no hay simulaciones asociadas a tus bancos. No hay datos disponibles."
+                    "Aún no hay simulaciones asociadas a tus bancos en los últimos 30 días. No hay datos disponibles."
             );
         }
 
@@ -236,10 +250,12 @@ public class DashboardServiceImpl implements DashboardService {
                 .map(e -> new CountByLabelDTO(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
     }
-
+    
     // US24
     @Override
     public DashboardResponseDTO getMetrics(Long adminUserId) {
+
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
 
         long totalUsers = userRepository.count();
         long totalApplicants = applicantRepository.count();
@@ -250,20 +266,20 @@ public class DashboardServiceImpl implements DashboardService {
         List<CountByLabelDTO> byLevelStudy = applicantRepository.countByLevelStudy();
         List<CountByLabelDTO> banksByCompany = questionBankRepository.countByCompany();
 
-        // simulaciones por mes
-        List<Simulation> sims = simulationRepository.findByStartedAtIsNotNull();
+        // actividad últimos 30 días
+        List<Simulation> sims = simulationRepository.findByStartedAtAfter(cutoff);
         Map<String, Long> bucket = new TreeMap<>();
         for (Simulation s : sims) {
-            String period = YearMonth.from(s.getStartedAt()).toString(); // YYYY-MM
+            String period = s.getStartedAt().toLocalDate().toString(); // YYYY-MM-DD
             bucket.merge(period, 1L, Long::sum);
         }
         List<TimeBucketDTO> simulationsOverTime = bucket.entrySet().stream()
                 .map(e -> new TimeBucketDTO(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
 
-        Double avgScore = simulationReportRepository.averageOverallScore();
+        // Score avg >> últimos 30 días
+        Double avgScore = simulationReportRepository.averageOverallScoreSince(cutoff);
 
-        // cuando faltan datos, como es un estado del sistema no lanza excepcion
         boolean hasEnoughData = totalUsers > 0 && totalSimulations > 0;
         String message = hasEnoughData ? null : "Aún no hay datos suficientes para mostrar métricas significativas.";
 
