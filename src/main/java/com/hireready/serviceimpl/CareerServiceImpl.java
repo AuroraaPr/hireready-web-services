@@ -35,7 +35,7 @@ public class CareerServiceImpl implements CareerService {
 
     // US16
     @Override
-    public List<CareerResponseDTO> listAll(Long adminUserId) {
+    public List<CareerResponseDTO> listAll() {
         List<CareerResponseDTO> result = new ArrayList<>();
         for (Career c : careerRepository.findAll()) {
             result.add(new CareerResponseDTO(c.getId(), c.getName()));
@@ -45,7 +45,7 @@ public class CareerServiceImpl implements CareerService {
 
     // US16
     @Override
-    public CareerResponseDTO create(Long adminUserId, CareerRequestDTO request) {
+    public CareerResponseDTO create(CareerRequestDTO request) {
         if (request.getName() == null || request.getName().isBlank()) {
             throw new ValidationException("Career name is required");
         }
@@ -61,7 +61,7 @@ public class CareerServiceImpl implements CareerService {
 
     // US16
     @Override
-    public CareerResponseDTO update(Long adminUserId, Long careerId, CareerRequestDTO request) {
+    public CareerResponseDTO update(Long careerId, CareerRequestDTO request) {
         if (request.getName() == null || request.getName().isBlank()) {
             throw new ValidationException("Career name is required");
         }

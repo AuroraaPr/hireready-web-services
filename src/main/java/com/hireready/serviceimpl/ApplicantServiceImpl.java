@@ -160,7 +160,7 @@ public class ApplicantServiceImpl implements ApplicantService {
     }
 
     @Override
-    public List<ApplicantSummaryResponseDTO> listAll(Long adminUserId) {
+    public List<ApplicantSummaryResponseDTO> listAll() {
         List<ApplicantSummaryResponseDTO> result = new ArrayList<>();
         for (Applicant a : applicantRepository.findAll()) {
             result.add(new ApplicantSummaryResponseDTO(

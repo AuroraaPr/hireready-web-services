@@ -48,7 +48,6 @@ public class CompanyController {
     // US18  GET http://localhost:8080/hireready/admin/companies
     @GetMapping("/admin/companies")
     public ResponseEntity<List<CompanySummaryResponseDTO>> listAll() {
-        Long adminUserId = userService.getAuthenticatedUserId();
-        return new ResponseEntity<>(companyService.listAll(adminUserId), HttpStatus.OK);
+        return new ResponseEntity<>(companyService.listAll(), HttpStatus.OK);
     }
 }

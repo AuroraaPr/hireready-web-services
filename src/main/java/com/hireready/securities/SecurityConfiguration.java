@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/hireready/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/hireready/applicants").permitAll() //para registro (2)
                 .requestMatchers(HttpMethod.POST, "/hireready/companies").permitAll()
+                .requestMatchers(HttpMethod.GET, "/hireready/careers").permitAll() //para dropdown
 
                 //POR ROL
                 .requestMatchers("/hireready/admin/**").hasAuthority("ROLE_ADMIN")

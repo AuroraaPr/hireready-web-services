@@ -17,21 +17,23 @@ import java.util.List;
 public class CareerController {
     @Autowired
     CareerService careerService;
-    @Autowired
-    private UserService userService;
+
+    // GET http://localhost:8080/hireready/careers (público)
+    @GetMapping("/careers")
+    public ResponseEntity<List<CareerResponseDTO>> listPublic() {
+        return new ResponseEntity<>(careerService.listAll(), HttpStatus.OK);
+    }
 
     // US16  GET http://localhost:8080/hireready/admin/careers
     @GetMapping("/admin/careers")
     public ResponseEntity<List<CareerResponseDTO>> listAll() {
-        Long adminUserId = userService.getAuthenticatedUserId();
-        return new ResponseEntity<>(careerService.listAll(adminUserId), HttpStatus.OK);
+        return new ResponseEntity<>(careerService.listAll(), HttpStatus.OK);
     }
 
     // US16  POST http://localhost:8080/hireready/admin/careers
     @PostMapping("/admin/careers")
     public ResponseEntity<CareerResponseDTO> create(@RequestBody CareerRequestDTO request) {
-        Long adminUserId = userService.getAuthenticatedUserId();
-        return new ResponseEntity<>(careerService.create(adminUserId, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(careerService.create(request), HttpStatus.CREATED);
     }
 
     // US16  PUT http://localhost:8080/hireready/admin/careers/{careerId}
@@ -39,8 +41,7 @@ public class CareerController {
     public ResponseEntity<CareerResponseDTO> update(
             @PathVariable("careerId") Long careerId,
             @RequestBody CareerRequestDTO request) {
-        Long adminUserId = userService.getAuthenticatedUserId();
         return new ResponseEntity<>(
-                careerService.update(adminUserId, careerId, request), HttpStatus.OK);
+                careerService.update(careerId, request), HttpStatus.OK);
     }
 }

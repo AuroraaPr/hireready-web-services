@@ -13,5 +13,5 @@ public interface CompanyService {
     public Company findByUserId(Long userId);
     public CompanyResponseDTO getProfile(Long userId);
     public CompanyResponseDTO updateProfile(Long userId, CompanyUpdateDTO companyUpdateDTO);
-    public List<CompanySummaryResponseDTO> listAll(Long adminUserId);
+    public List<CompanySummaryResponseDTO> listAll();
 }

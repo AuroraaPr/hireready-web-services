@@ -49,7 +49,6 @@ public class ApplicantController {
     // US17  GET http://localhost:8080/hireready/admin/applicants
     @GetMapping("/admin/applicants")
     public ResponseEntity<List<ApplicantSummaryResponseDTO>> listAll() {
-        Long adminUserId = userService.getAuthenticatedUserId();
-        return new ResponseEntity<>(applicantService.listAll(adminUserId), HttpStatus.OK);
+        return new ResponseEntity<>(applicantService.listAll(), HttpStatus.OK);
     }
 }

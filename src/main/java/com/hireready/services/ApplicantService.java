@@ -13,5 +13,5 @@ public interface ApplicantService {
     public Applicant findByUserId(Long userId);
     public ApplicantResponseDTO getProfile(Long userId);
     public ApplicantResponseDTO updateProfile(Long userId, ApplicantUpdateDTO applicantUpdateDTO);
-    public List<ApplicantSummaryResponseDTO> listAll(Long adminUserId);
+    public List<ApplicantSummaryResponseDTO> listAll();
 }

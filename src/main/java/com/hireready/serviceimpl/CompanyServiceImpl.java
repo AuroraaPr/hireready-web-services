@@ -108,7 +108,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     // US18
     @Override
-    public List<CompanySummaryResponseDTO> listAll(Long adminUserId) {
+    public List<CompanySummaryResponseDTO> listAll() {
         List<CompanySummaryResponseDTO> result = new ArrayList<>();
         for (Company c : companyRepository.findAll()) {
             result.add(new CompanySummaryResponseDTO(
