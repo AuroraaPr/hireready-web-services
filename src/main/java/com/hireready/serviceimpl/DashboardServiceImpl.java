@@ -250,7 +250,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .map(e -> new CountByLabelDTO(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
     }
-    
+
     // US24
     @Override
     public DashboardResponseDTO getMetrics(Long adminUserId) {
