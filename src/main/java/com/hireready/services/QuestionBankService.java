@@ -13,6 +13,8 @@ public interface QuestionBankService {
     public QuestionBankResponseDTO create(Long companyUserId, CreateQuestionBankRequestDTO createQuestionBankRequestDTO);
     public QuestionBank findById(Long id);
     public List<QuestionBankSummaryResponseDTO> listAvailableForApplicant(Long applicantUserId, String filter);
-    List<QuestionBankAdminSummaryResponseDTO> listForAdmin(Long adminUserId, Long companyId); // US-20
-    QuestionBankResponseDTO findDetailForAdmin(Long adminUserId, Long bankId);
+    public List<QuestionBankAdminSummaryResponseDTO> listForAdmin(Long adminUserId, Long companyId); // US-20
+    public QuestionBankResponseDTO findDetailForAdmin(Long adminUserId, Long bankId);
+    public List<QuestionBankSummaryResponseDTO> listForCompany(Long companyUserId);
+    public QuestionBankResponseDTO findDetailForCompany(Long companyUserId, Long bankId);
 }

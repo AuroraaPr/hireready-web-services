@@ -33,6 +33,23 @@ public class QuestionBankController {
                 questionBankService.create(companyUserId, createQuestionBankRequestDTO), HttpStatus.CREATED);
     }
 
+    // GET http://localhost:8080/hireready/companies/me/question-banks
+    @GetMapping("/companies/me/question-banks")
+    public ResponseEntity<List<QuestionBankSummaryResponseDTO>> listForCompany() {
+        Long companyUserId = userService.getAuthenticatedUserId();
+        return new ResponseEntity<>(
+                questionBankService.listForCompany(companyUserId), HttpStatus.OK);
+    }
+
+    // GET http://localhost:8080/hireready/companies/me/question-banks/{bankId}
+    @GetMapping("/companies/me/question-banks/{bankId}")
+    public ResponseEntity<QuestionBankResponseDTO> getByIdForCompany(
+            @PathVariable("bankId") Long bankId) {
+        Long companyUserId = userService.getAuthenticatedUserId();
+        return new ResponseEntity<>(
+                questionBankService.findDetailForCompany(companyUserId, bankId), HttpStatus.OK);
+    }
+
     // US07 y US08
     // GET http://localhost:8080/hireready/applicants/me/question-banks?filter=all
     // GET http://localhost:8080/hireready/applicants/me/question-banks?filter=recommended

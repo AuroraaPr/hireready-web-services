@@ -233,4 +233,51 @@ public class QuestionBankServiceImpl implements QuestionBankService {
         bank.setQuestions(questionService.listByBankOrdered(bank.getId()));
         return toFullResponse(bank);
     }
+
+    @Override
+    public List<QuestionBankSummaryResponseDTO> listForCompany(Long companyUserId) {
+        Company company = companyService.findByUserId(companyUserId);
+        List<QuestionBank> banks = questionBankRepository.findByCompany_Id(company.getId());
+
+        List<QuestionBankSummaryResponseDTO> result = new ArrayList<>();
+        for (QuestionBank b : banks) {
+            result.add(toSummaryForCompany(b));
+        }
+        return result;
+    }
+
+    @Override
+    public QuestionBankResponseDTO findDetailForCompany(Long companyUserId, Long bankId) {
+        Company company = companyService.findByUserId(companyUserId);
+        QuestionBank bank = findById(bankId);
+
+        if (!bank.getCompany().getId().equals(company.getId())) {
+            throw new ValidationException("QuestionBank id: " + bankId + " does not belong to the company.");
+        }
+
+        bank.setQuestions(questionService.listByBankOrdered(bank.getId()));
+        return toFullResponse(bank);
+    }
+
+    private QuestionBankSummaryResponseDTO toSummaryForCompany(QuestionBank b) {
+        List<String> careerNames = new ArrayList<>();
+        if (b.getQuestionBankCareers() != null) {
+            careerNames = b.getQuestionBankCareers().stream()
+                    .map(qbc -> qbc.getCareer().getName())
+                    .collect(Collectors.toList());
+        }
+        int numQuestions = b.getQuestions() == null ? 0 : b.getQuestions().size();
+
+        String status = "UNUSED";
+        if (b.getSimulations() != null && !b.getSimulations().isEmpty()) {
+            status = "ACTIVE";
+        }
+
+        return new QuestionBankSummaryResponseDTO(
+                b.getId(), b.getName(),
+                b.getCompany() != null ? b.getCompany().getName() : null,
+                b.getDescription(), b.getJobPosition(), b.getLevel(),
+                careerNames, numQuestions, status
+        );
+    }
 }
