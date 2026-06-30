@@ -37,10 +37,19 @@ public class UserController {
         UserSecurity userSecurity = (UserSecurity) userDetailsService.loadUserByUsername(request.getEmail());
         String jwt = jwtUtilService.generateToken(userSecurity);
         User u = userSecurity.getUser();
+        String name;
+        if (u.getApplicant() != null) {
+            name = u.getApplicant().getName();
+        } else if (u.getCompany() != null) {
+            name = u.getCompany().getName();
+        } else {
+            name = "Administrador";
+        }
         return new ResponseEntity<>(new TokenResponseDTO(
                 jwt,
                 u.getId(),
                 u.getEmail(),
+                name,
                 u.getAuthority() != null ? u.getAuthority().getRole() : null,
                 u.getApplicant() != null ? u.getApplicant().getId() : null,
                 u.getCompany()   != null ? u.getCompany().getId()   : null
