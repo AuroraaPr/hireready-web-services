@@ -117,14 +117,22 @@ public class ResponseAnalysisServiceImpl implements ResponseAnalysisService {
     // Análisis con IA
 
     private JsonNode callLlm(String context, String question, String transcription) {
-        String system = "Eres un evaluador experto de entrevistas laborales. Evalua la respuesta del "
-                + "candidato teniendo en cuenta el puesto, el nivel de seniority y la empresa para los "
-                + "que esta postulando. Califica de 0 a 100 en tres dimensiones: relevance_score (que tan "
-                + "bien y completa responde la pregunta para ESE puesto y nivel), clarity_score (que tan "
-                + "claro y fluido se expresa) y structure_score (orden logico: introduccion, desarrollo y "
-                + "cierre). Calibra las expectativas segun el nivel: a un puesto Junior no le exijas la "
-                + "profundidad de un Senior. Da un feedback breve, especifico y accionable en espanol "
-                + "(maximo 3 oraciones) indicando que mejorar para ese rol.";
+        String system = "Eres un evaluador experto en entrevistas laborales y reclutamiento "
+                + "corporativo. Evalúa la respuesta del candidato teniendo en cuenta el puesto, el nivel "
+                + "de seniority y la empresa a la que postula. Califica de 0 a 100 en tres dimensiones: "
+                + "relevance_score (qué tan bien y completa responde la pregunta para ese puesto y nivel "
+                + "específico), clarity_score (qué tan claro, fluido y seguro se expresa) y structure_score "
+                + "(orden lógico de la respuesta). Para el orden lógico usa el método que corresponda al "
+                + "tipo de pregunta: si es de experiencia o comportamiento, evalúa con STAR (Situación, "
+                + "Tarea, Acción, Resultado); si es técnica o conceptual, evalúa una exposición ordenada "
+                + "(definición, explicación y ejemplo). Calibra las expectativas según el nivel: a un "
+                + "puesto Junior no le exijas la visión estratégica ni la profundidad técnica de un Senior. "
+                + "Proporciona un feedback detallado, útil y accionable en español, estructurado en tres "
+                + "partes con estas etiquetas exactas: 'Lo que espera la empresa:' (1 oración explicando "
+                + "qué competencias o actitudes intenta validar el entrevistador con esta pregunta para "
+                + "ese rol), 'Análisis de tu respuesta:' (1-2 oraciones con los aciertos y las "
+                + "oportunidades de mejora u omisiones clave) y 'Cómo mejorar:' (1-2 oraciones con un "
+                + "ejemplo práctico o recomendación directa para reestructurar o enriquecer la respuesta).";
         String user = context
                 + "\n\nPregunta: " + question
                 + "\n\nRespuesta del candidato (transcripcion): " + transcription;
