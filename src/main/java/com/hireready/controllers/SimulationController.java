@@ -39,6 +39,15 @@ public class SimulationController {
                 simulationService.continueLatest(applicantUserId), HttpStatus.OK);
     }
 
+    // US10-b  GET http://localhost:8080/hireready/applicants/me/simulations/current-by-bank?bankId=X
+    @GetMapping("/applicants/me/simulations/current-by-bank")
+    public ResponseEntity<ContinueSimulationResponseDTO> getCurrentByBank(
+            @RequestParam("bankId") Long bankId) {
+        Long applicantUserId = userService.getAuthenticatedUserId();
+        return new ResponseEntity<>(
+                simulationService.continueByBank(applicantUserId, bankId), HttpStatus.OK);
+    }
+
     // US11  POST http://localhost:8080/hireready/applicants/me/simulations/{simulationId}/responses
     @PostMapping("/applicants/me/simulations/{simulationId}/responses")
     public ResponseEntity<SubmitResponseResponseDTO> submitResponse(

@@ -127,12 +127,18 @@ public class ResponseAnalysisServiceImpl implements ResponseAnalysisService {
                 + "Tarea, Acción, Resultado); si es técnica o conceptual, evalúa una exposición ordenada "
                 + "(definición, explicación y ejemplo). Calibra las expectativas según el nivel: a un "
                 + "puesto Junior no le exijas la visión estratégica ni la profundidad técnica de un Senior. "
-                + "Proporciona un feedback detallado, útil y accionable en español, estructurado en tres "
-                + "partes con estas etiquetas exactas: 'Lo que espera la empresa:' (1 oración explicando "
-                + "qué competencias o actitudes intenta validar el entrevistador con esta pregunta para "
-                + "ese rol), 'Análisis de tu respuesta:' (1-2 oraciones con los aciertos y las "
-                + "oportunidades de mejora u omisiones clave) y 'Cómo mejorar:' (1-2 oraciones con un "
-                + "ejemplo práctico o recomendación directa para reestructurar o enriquecer la respuesta).";
+                + "Si la pregunta está formulada en un idioma distinto al español (por ejemplo inglés, "
+                + "porque el puesto lo requiere), evalúa además si el candidato respondió en ese mismo "
+                + "idioma y con el nivel de dominio adecuado para el rol; considéralo en las tres "
+                + "dimensiones (una respuesta en el idioma equivocado o con dominio deficiente del idioma "
+                + "requerido debe reflejarse en los puntajes) y coméntalo en el feedback. "
+                + "Proporciona el feedback SIEMPRE en español, sin importar el idioma de la pregunta. "
+                + "El feedback debe ser un único párrafo corrido, fluido y natural (NO uses títulos, "
+                + "etiquetas, encabezados, viñetas ni divisiones); en ese mismo párrafo integra de forma "
+                + "orgánica: qué buscaba validar el entrevistador con la pregunta para ese rol, los "
+                + "aciertos y las omisiones o puntos débiles de la respuesta, y una recomendación práctica "
+                + "y accionable (con un ejemplo concreto) para enriquecer o reestructurar la respuesta. "
+                + "Que sea detallado, útil y adaptado al contexto del puesto, la empresa y el nivel.";
         String user = context
                 + "\n\nPregunta: " + question
                 + "\n\nRespuesta del candidato (transcripcion): " + transcription;

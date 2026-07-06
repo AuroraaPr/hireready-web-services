@@ -56,7 +56,7 @@ public class UserController {
         ), HttpStatus.OK);
     }
 
-    // US19  POST http://localhost:8080/hireready/admin/{userId}/users/{targetUserId}/deactivate
+    // US19  POST http://localhost:8080/hireready/admin/users/{targetUserId}/deactivate
     @PostMapping("/admin/users/{targetUserId}/deactivate")
     public ResponseEntity<UserStatusResponseDTO> deactivate(
             @PathVariable("targetUserId") Long targetUserId) {
@@ -65,7 +65,7 @@ public class UserController {
                 userService.setEnabled(adminUserId, targetUserId, false), HttpStatus.OK);
     }
 
-    // US19  POST http://localhost:8080/hireready/admin/{userId}/users/{targetUserId}/activate
+    // US19  POST http://localhost:8080/hireready/admin/users/{targetUserId}/activate
     @PostMapping("/admin/users/{targetUserId}/activate")
     public ResponseEntity<UserStatusResponseDTO> activate(
             @PathVariable("targetUserId") Long targetUserId) {

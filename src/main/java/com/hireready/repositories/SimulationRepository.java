@@ -20,4 +20,8 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long> {
     public Long countByApplicant_IdAndStatusAndCompletedAtAfter(Long applicantId, SimulationStatus status, LocalDateTime cutoff);
     public List<Simulation> findByQuestionBank_Company_IdAndStartedAtAfter(Long companyId, LocalDateTime cutoff);
     public List<Simulation> findByStartedAtAfter(LocalDateTime cutoff);
+    public List<Simulation> findByApplicant_IdAndQuestionBank_IdAndStatus(
+            Long applicantId, Long questionBankId, SimulationStatus status);
+    public Simulation findFirstByApplicant_IdAndQuestionBank_IdAndStatusOrderByStartedAtDesc(
+            Long applicantId, Long questionBankId, SimulationStatus status);
 }

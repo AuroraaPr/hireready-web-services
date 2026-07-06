@@ -157,6 +157,19 @@ public class HireReadyApplication {
                 questionBankCareerRepository.save(new QuestionBankCareer(null, compSci, b4));
                 questionBankCareerRepository.save(new QuestionBankCareer(null, industrial, b4));
 
+
+                QuestionBank b5 = questionBankRepository.save(new QuestionBank(
+                        null, "Prueba banco vacío",
+                        "Evaluación de fundamentos de SQL, estadística y herramientas de BI.",
+                        "Data Analyst", "Junior", innovate, null, null, null));
+                questionRepository.save(new Question(null, "Diferencia entre INNER JOIN y LEFT JOIN, con un ejemplo.", 1, b5, null));
+                questionRepository.save(new Question(null, "¿Qué es una window function en SQL?", 2, b5, null));
+                questionRepository.save(new Question(null, "Explica cuándo aplicarías un A/B test.", 3, b5, null));
+                questionRepository.save(new Question(null, "¿Cómo limpiarías un dataset con valores nulos y outliers?", 4, b5, null));
+                questionBankCareerRepository.save(new QuestionBankCareer(null, software, b5));
+                questionBankCareerRepository.save(new QuestionBankCareer(null, compSci, b5));
+                questionBankCareerRepository.save(new QuestionBankCareer(null, industrial, b5));
+
                 System.out.println("   4 bancos creados (3 TechCorp + 1 InnovateLab) con preguntas y carreras vinculadas");
 
                 // =================== 7. SIMULACIONES ===================

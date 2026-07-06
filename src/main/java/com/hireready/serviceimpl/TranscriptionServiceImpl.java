@@ -38,7 +38,6 @@ public class TranscriptionServiceImpl implements TranscriptionService {
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("model", model);
-        body.add("language", "es");
         body.add("file", fileResource);
 
         try {

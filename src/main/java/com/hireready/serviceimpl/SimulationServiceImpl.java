@@ -60,17 +60,17 @@ public class SimulationServiceImpl implements SimulationService {
         QuestionBank bank = questionBankService.findById(request.getQuestionBankId());
 
         //detectar simulaciones en progreso
-        List<Simulation> inProgress = simulationRepository
-                .findByApplicant_IdAndStatus(applicant.getId(), SimulationStatus.IN_PROGRESS);
+        List<Simulation> inProgressMismoBanco = simulationRepository
+                .findByApplicant_IdAndQuestionBank_IdAndStatus(
+                        applicant.getId(), bank.getId(), SimulationStatus.IN_PROGRESS);
 
-        if (!inProgress.isEmpty()) {
+        if (!inProgressMismoBanco.isEmpty()) {
             boolean confirm = Boolean.TRUE.equals(request.getConfirmAbandonPrevious());
             if (!confirm) {
                 throw new ValidationException(
-                        "There is a simulation in progress. Send confirmAbandonPrevious=true to abandon it and start a new one.");
+                        "There is a simulation in progress for this bank. Send confirmAbandonPrevious=true to abandon it and start a new one.");
             }
-            // marca commo abandonada
-            for (Simulation s : inProgress) {
+            for (Simulation s : inProgressMismoBanco) {
                 s.setStatus(SimulationStatus.ABANDONED);
                 s.setCompletedAt(LocalDateTime.now());
                 simulationRepository.save(s);
@@ -104,6 +104,57 @@ public class SimulationServiceImpl implements SimulationService {
                         applicant.getId(), SimulationStatus.IN_PROGRESS);
         if (sim == null) {
             throw new ResourceNotFoundException("No in-progress simulation for applicant id: " + applicant.getId());
+        }
+
+        List<Question> ordered = questionService.listByBankOrdered(sim.getQuestionBank().getId());
+        List<Response> answered = responseService.listBySimulationId(sim.getId());
+
+        Set<Long> answeredQuestionIds = new HashSet<>();
+        for (Response r : answered) {
+            if (r.getQuestion() != null) answeredQuestionIds.add(r.getQuestion().getId());
+        }
+
+        Question pending = null;
+        for (Question q : ordered) {
+            if (!answeredQuestionIds.contains(q.getId())) {
+                pending = q;
+                break;
+            }
+        }
+        if (pending == null) {
+            return new ContinueSimulationResponseDTO(
+                    sim.getId(),
+                    sim.getStatus(),
+                    null,
+                    ordered.size(),
+                    answered.size());
+        }
+
+        QuestionResponseDTO pendingDto = new QuestionResponseDTO(
+                pending.getId(),
+                pending.getContent(),
+                pending.getOrderIndex()
+        );
+        return new ContinueSimulationResponseDTO(
+                sim.getId(),
+                sim.getStatus(),
+                pendingDto,
+                ordered.size(),
+                answered.size()
+        );
+    }
+
+    // US10
+    @Override
+    public ContinueSimulationResponseDTO continueByBank(Long applicantUserId, Long questionBankId) {
+        Applicant applicant = applicantService.findByUserId(applicantUserId);
+
+        Simulation sim = simulationRepository
+                .findFirstByApplicant_IdAndQuestionBank_IdAndStatusOrderByStartedAtDesc(
+                        applicant.getId(), questionBankId, SimulationStatus.IN_PROGRESS);
+        if (sim == null) {
+            throw new ResourceNotFoundException(
+                    "No in-progress simulation for bank id: " + questionBankId);
         }
 
         List<Question> ordered = questionService.listByBankOrdered(sim.getQuestionBank().getId());
